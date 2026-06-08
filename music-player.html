@@ -12,7 +12,404 @@ body {
   background: #141414;
   color: #fff;The provided text is CSS code, not a natural language text that can be rewritten to be more concise and well-written. It is already in a concise and structured format for its intended purpose.
   min-height: 100vh;
+  display: flex;<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎵 Patrick's Music Player</title>
+<style>
+:root { color-scheme: dark; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #141414;
+  color: #fff;
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+header {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  position: sticky; top: 0; z-index: 10;
+}
+header .logo { font-size: 18px; }
+header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+.badge {
+  margin-left: auto;
+  font-size: 10px;
+  background: rgba(29,185,84,0.2);
+  color: #1db954;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.player-section { flex-shrink: 0; padding: 14px 14px 0; }
+#yt-container {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+#yt-player { width: 100%; height: 100%; }
+.yt-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: #444; gap: 8px; font-size: 13px;
+  position: absolute; top: 0; left: 0;
+  background: #111; z-index: 1;
+}
+.yt-placeholder .ph-icon { font-size: 36px; }
+
+.now-playing { padding: 10px 14px 2px; }
+.np-title {
+  font-size: 15px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+.np-meta { font-size: 11px; color: #666; margin-top: 3px; }
+
+.controls {
+  padding: 10px 14px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.ctrl {
+  border: none; cursor: pointer; border-radius: 8px;
+  font-size: 13px; display: flex; align-items: center; justify-content: center;
+  gap: 5px; transition: background 0.12s; color: #fff;
+  background: rgba(255,255,255,0.07); padding: 8px 12px;
+}
+.ctrl:hover { background: rgba(255,255,255,0.13); }
+.ctrl:active { transform: scale(0.95); }
+.ctrl.icon-only { width: 40px; height: 40px; padding: 0; flex-shrink: 0; font-size: 16px; }
+.ctrl.shuffle-on { background: rgba(29,185,84,0.2); color: #1db954; }
+.ctrl.flex-grow { flex: 1; }
+.ctrl#play-btn { flex: 0 0 48px; height: 48px; font-size: 18px; border-radius: 50%; background: #1db954; color: #000; }
+.ctrl#play-btn:hover { background: #1ed760; }
+
+.divider { height: 1px; background: rgba(255,255,255,0.06); }
+
+.pl-section { flex: 1; overflow-y: auto; min-height: 0; padding-bottom: 20px; }
+.pl-header {
+  padding: 10px 14px 6px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #555;
+  position: sticky; top: 0; background: #141414; z-index: 2;
+}
+
+.song-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; cursor: pointer;
+  transition: background 0.1s;
+}
+.song-item:hover { background: rgba(255,255,255,0.04); }
+.song-item.active {
+  background: rgba(29,185,84,0.08);
+  border-left: 2px solid #1db954;
+  padding-left: 12px;
+}
+.s-num { font-size: 11px; color: #555; width: 16px; text-align: right; flex-shrink: 0; }
+.song-item.active .s-num { color: #1db954; }
+.s-art {
+  width: 40px; height: 40px; border-radius: 6px;
+  background: #222; object-fit: cover; flex-shrink: 0;
+}
+.s-art-ph {
+  width: 40px; height: 40px; border-radius: 6px;
+  background: #222; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.s-info { flex: 1; min-width: 0; }
+.s-title-wrap {
+  display: flex; align-items: center; gap: 4px;
+  white-space: nowrap; overflow: hidden;
+}
+.s-title {
+  font-size: 13px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-width: 0;
+}
+.song-item.active .s-title { color: #1db954; }
+.notion-link {
+  flex-shrink: 0;
+  font-size: 11px; color: #444;
+  text-decoration: none;
+  padding: 1px 3px; border-radius: 3px;
+  transition: color 0.12s, background 0.12s;
+  line-height: 1;
+}
+.notion-link:hover { color: #888; background: rgba(255,255,255,0.07); }
+.song-item.active .notion-link { color: #1db954; opacity: 0.7; }
+.s-sub { font-size: 11px; color: #666; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">🎵</span>
+  <h1>Patrick's Music Player</h1>
+  <span class="badge" id="song-count-badge">0곡</span>
+</header>
+
+<div class="player-section">
+  <div id="yt-container">
+    <div class="yt-placeholder" id="yt-placeholder">
+      <span class="ph-icon">🎵</span>
+      <span>곡을 선택하거나 재생 버튼을 누르세요</span>
+    </div>
+    <div id="yt-player"></div>
+  </div>
+</div>
+
+<div class="now-playing">
+  <div class="np-title" id="np-title">Patrick's Daily Music</div>
+  <div class="np-meta" id="np-meta">셔플 재생 준비 중...</div>
+</div>
+
+<div class="controls">
+  <button class="ctrl icon-only" onclick="playPrev()" title="이전 곡">⏮</button>
+  <button class="ctrl" id="play-btn" onclick="togglePlay()" title="재생/일시정지">▶</button>
+  <button class="ctrl flex-grow shuffle-on" id="shuffle-btn" onclick="toggleShuffle()">🔀 셔플</button>
+  <button class="ctrl icon-only" onclick="playNext()" title="다음 곡">⏭</button>
+</div>
+
+<div class="divider"></div>
+
+<div class="pl-section">
+  <div class="pl-header" id="pl-label">플레이리스트</div>
+  <div id="pl-body"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   SONGS — patricks-music-pick 스킬이 이 배열을 자동으로 업데이트합니다
+   새 곡이 추가될 때마다 이 파일도 재생성됩니다
+   ═══════════════════════════════════════════════ */
+const SONGS = [
+  {
+    title: "White Gloves",
+    artist: "Khruangbin",
+    youtubeId: "wJzoos4rE_o",
+    albumArt: "https://img.youtube.com/vi/wJzoos4rE_o/maxresdefault.jpg",
+    year: "2024",
+    date: "2026-06-05",
+    notionUrl: "https://patrickdongkiyoo.notion.site/White-Gloves-Khruangbin-376705406ba6811ca874d1d3464d6c2a"
+  },
+  {
+    title: "后来 (나중에야)",
+    artist: "刘若英 (Rene Liu)",
+    youtubeId: "jftp5DuZ9Ok",
+    albumArt: "https://img.youtube.com/vi/jftp5DuZ9Ok/maxresdefault.jpg",
+    year: "1999",
+    date: "2026-06-05",
+    notionUrl: "https://patrickdongkiyoo.notion.site/Rene-Liu-376705406ba68159a152db90760eabf1"
+  },
+  {
+    title: "Like My Father",
+    artist: "Jax",
+    youtubeId: "GCWl50HQZIM",
+    albumArt: "https://img.youtube.com/vi/GCWl50HQZIM/maxresdefault.jpg",
+    year: "2021",
+    date: "2026-06-06",
+    notionUrl: "https://patrickdongkiyoo.notion.site/Like-My-Father-Jax-376705406ba6812cb194dfc3269c6fb9"
+  },
+  {
+    title: "Regent's Park",
+    artist: "Bruno Major",
+    youtubeId: "hfGcqETUZwI",
+    albumArt: "https://i.ytimg.com/vi/hfGcqETUZwI/maxresdefault.jpg",
+    year: "2017",
+    date: "2026-06-08",
+    notionUrl: "https://patrickdongkiyoo.notion.site/Regents-Park-Bruno-Major-379705406ba6814786d2ee73019418b4"
+  },
+  {
+    title: "Back To Me",
+    artist: "The Rose (더 로즈)",
+    youtubeId: "haX6ENq0s0M",
+    albumArt: "https://i.ytimg.com/vi/haX6ENq0s0M/maxresdefault.jpg",
+    year: "2023",
+    date: "2026-06-08",
+    notionUrl: "https://patrickdongkiyoo.notion.site/Back-To-Me-The-Rose-379705406ba681839979ec4baafc7b66"
+  },
+  {
+    title: "기쁨, 슬픔, 아름다운 마음",
+    artist: "AKMU (악동뮤지션)",
+    youtubeId: "eNiPuDEUQpQ",
+    albumArt: "https://i.ytimg.com/vi/eNiPuDEUQpQ/hqdefault.jpg",
+    year: "2026",
+    date: "2026-06-08",
+    notionUrl: "https://patrickdongkiyoo.notion.site/AKMU-379705406ba6814b927feb6d75a14ab6"
+  }
+];
+
+/* ═══ Player State ═══ */
+let ytPlayer = null;
+let playOrder = [];
+let curIdx = 0;
+let isShuffled = true;
+let activeDataIdx = -1;
+
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ═══ Shuffle ═══ */
+function buildOrder(keepDataIdx) {
+  const n = SONGS.length;
+  playOrder = Array.from({length: n}, (_, i) => i);
+  if (isShuffled) {
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
+    }
+  }
+  if (keepDataIdx !== undefined && keepDataIdx >= 0) {
+    const pos = playOrder.indexOf(keepDataIdx);
+    curIdx = pos >= 0 ? pos : 0;
+  } else {
+    curIdx = 0;
+  }
+}
+
+/* ═══ YouTube IFrame API ═══ */
+window.onYouTubeIframeAPIReady = function() {
+  ytPlayer = new YT.Player('yt-player', {
+    height: '100%',
+    width: '100%',
+    playerVars: {
+      rel: 0,
+      modestbranding: 1,
+      playsinline: 1,
+      origin: window.location.origin || 'https://rawcdn.githack.com'
+    },
+    events: {
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange
+    }
+  });
+};
+
+function onPlayerReady() {
+  document.getElementById('yt-placeholder').style.display = 'none';
+  buildOrder();
+  playSong(playOrder[0]);
+}
+
+function onPlayerStateChange(event) {
+  const state = event.data;
+  if (state === YT.PlayerState.ENDED) playNext();
+  const isPlaying = state === YT.PlayerState.PLAYING;
+  document.getElementById('play-btn').textContent = isPlaying ? '⏸' : '▶';
+}
+
+/* ═══ Playback Controls ═══ */
+function playSong(dataIdx) {
+  const song = SONGS[dataIdx];
+  if (!song) return;
+  activeDataIdx = dataIdx;
+
+  if (ytPlayer && ytPlayer.loadVideoById) {
+    ytPlayer.loadVideoById(song.youtubeId);
+  }
+
+  document.getElementById('np-title').textContent = song.title || '—';
+  document.getElementById('np-meta').textContent =
+    [song.artist, song.year ? song.year + '년' : ''].filter(Boolean).join(' · ');
+
+  const pos = playOrder.indexOf(dataIdx);
+  if (pos !== -1) curIdx = pos;
+
+  document.querySelectorAll('.song-item').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.didx) === dataIdx);
+  });
+}
+
+function playNext() {
+  if (!SONGS.length) return;
+  curIdx = (curIdx + 1) % playOrder.length;
+  playSong(playOrder[curIdx]);
+}
+
+function playPrev() {
+  if (!SONGS.length) return;
+  curIdx = (curIdx - 1 + playOrder.length) % playOrder.length;
+  playSong(playOrder[curIdx]);
+}
+
+function togglePlay() {
+  if (!ytPlayer) return;
+  const state = ytPlayer.getPlayerState();
+  if (state === YT.PlayerState.PLAYING) {
+    ytPlayer.pauseVideo();
+  } else {
+    if (activeDataIdx < 0) { buildOrder(); playSong(playOrder[0]); }
+    else ytPlayer.playVideo();
+  }
+}
+
+function toggleShuffle() {
+  isShuffled = !isShuffled;
+  const btn = document.getElementById('shuffle-btn');
+  btn.classList.toggle('shuffle-on', isShuffled);
+  btn.textContent = isShuffled ? '🔀 셔플' : '▶ 순서대로';
+  buildOrder(activeDataIdx);
+}
+
+/* ═══ Playlist Render ═══ */
+function renderPlaylist() {
+  const body = document.getElementById('pl-body');
+  document.getElementById('song-count-badge').textContent = `${SONGS.length}곡`;
+  document.getElementById('pl-label').textContent = `플레이리스트 · ${SONGS.length}곡`;
+
+  body.innerHTML = SONGS.map((s, i) => {
+    const artHtml = s.albumArt
+      ? `<img class="s-art" src="${esc(s.albumArt)}"
+             onerror="this.outerHTML='<div class=\\'s-art-ph\\'>🎵</div>'" alt="">`
+      : `<div class="s-art-ph">🎵</div>`;
+
+    const notionBtn = s.notionUrl
+      ? `<a class="notion-link" href="${esc(s.notionUrl)}" target="_blank"
+           onclick="event.stopPropagation()" title="Notion 페이지 열기">📝</a>`
+      : '';
+
+    return `
+      <div class="song-item" data-didx="${i}" onclick="playSong(${i})">
+        <span class="s-num">${i + 1}</span>
+        ${artHtml}
+        <div class="s-info">
+          <div class="s-title-wrap">
+            <span class="s-title">${esc(s.title)}</span>
+            ${notionBtn}
+          </div>
+          <div class="s-sub">${esc(s.artist)}${s.year ? ' · ' + s.year : ''}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ═══ Init ═══ */
+renderPlaylist();
+</script>
+
+<!-- YouTube IFrame API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
+
   flex-direction: column;
   max-width: 520px;
   margin: 0 auto;
