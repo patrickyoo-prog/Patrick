@@ -17,7 +17,6 @@ body {
   max-width: 520px;
   margin: 0 auto;
 }
-
 header {
   padding: 12px 16px;
   background: rgba(255,255,255,0.04);
@@ -38,7 +37,6 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
   border-radius: 10px;
   font-weight: 700;
 }
-
 .player-section { flex-shrink: 0; padding: 14px 14px 0; }
 #yt-container {
   width: 100%;
@@ -58,7 +56,6 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
   background: #111; z-index: 1;
 }
 .yt-placeholder .ph-icon { font-size: 36px; }
-
 .now-playing { padding: 10px 14px 2px; }
 .np-title {
   font-size: 15px; font-weight: 700;
@@ -66,7 +63,6 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
   letter-spacing: -0.01em;
 }
 .np-meta { font-size: 11px; color: #666; margin-top: 3px; }
-
 .controls {
   padding: 10px 14px 12px;
   display: flex; align-items: center; gap: 8px;
@@ -84,9 +80,7 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
 .ctrl.flex-grow { flex: 1; }
 .ctrl#play-btn { flex: 0 0 48px; height: 48px; font-size: 18px; border-radius: 50%; background: #1db954; color: #000; }
 .ctrl#play-btn:hover { background: #1ed760; }
-
 .divider { height: 1px; background: rgba(255,255,255,0.06); }
-
 .pl-section { flex: 1; overflow-y: auto; min-height: 0; padding-bottom: 20px; }
 .pl-header {
   padding: 10px 14px 6px;
@@ -94,7 +88,6 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
   text-transform: uppercase; letter-spacing: 0.1em; color: #555;
   position: sticky; top: 0; background: #141414; z-index: 2;
 }
-
 .song-item {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 14px; cursor: pointer;
@@ -180,10 +173,6 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════
-   SONGS — patricks-music-pick 스킬이 이 배열을 자동으로 업데이트합니다
-   새 곡이 추가될 때마다 이 파일도 재생성됩니다
-   ═══════════════════════════════════════════════ */
 const SONGS = [
   {
     title: "White Gloves",
@@ -247,10 +236,18 @@ const SONGS = [
     year: "2001",
     date: "2026-06-08",
     notionUrl: "https://patrickdongkiyoo.notion.site/The-Luckiest-Ben-Folds-379705406ba68140aa10f9eb9bb11255"
+  },
+  {
+    title: "Feels So Good",
+    artist: "Chuck Mangione",
+    youtubeId: "WPZHdldAMHg",
+    albumArt: "https://i.ytimg.com/vi/WPZHdldAMHg/hqdefault.jpg",
+    year: "1977",
+    date: "2026-06-08",
+    notionUrl: "https://patrickdongkiyoo.notion.site/Feels-So-Good-Chuck-Mangione-379705406ba681e0900cc389865dd152"
   }
 ];
 
-/* ═══ Player State ═══ */
 let ytPlayer = null;
 let playOrder = [];
 let curIdx = 0;
@@ -262,7 +259,6 @@ function esc(s) {
     c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* ═══ Shuffle ═══ */
 function buildOrder(keepDataIdx) {
   const n = SONGS.length;
   playOrder = Array.from({length: n}, (_, i) => i);
@@ -280,21 +276,12 @@ function buildOrder(keepDataIdx) {
   }
 }
 
-/* ═══ YouTube IFrame API ═══ */
 window.onYouTubeIframeAPIReady = function() {
   ytPlayer = new YT.Player('yt-player', {
-    height: '100%',
-    width: '100%',
-    playerVars: {
-      rel: 0,
-      modestbranding: 1,
-      playsinline: 1,
-      origin: window.location.origin || 'https://rawcdn.githack.com'
-    },
-    events: {
-      onReady: onPlayerReady,
-      onStateChange: onPlayerStateChange
-    }
+    height: '100%', width: '100%',
+    playerVars: { rel: 0, modestbranding: 1, playsinline: 1,
+      origin: window.location.origin || 'https://rawcdn.githack.com' },
+    events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange }
   });
 };
 
@@ -307,40 +294,31 @@ function onPlayerReady() {
 function onPlayerStateChange(event) {
   const state = event.data;
   if (state === YT.PlayerState.ENDED) playNext();
-  const isPlaying = state === YT.PlayerState.PLAYING;
-  document.getElementById('play-btn').textContent = isPlaying ? '⏸' : '▶';
+  document.getElementById('play-btn').textContent =
+    state === YT.PlayerState.PLAYING ? '⏸' : '▶';
 }
 
-/* ═══ Playback Controls ═══ */
 function playSong(dataIdx) {
   const song = SONGS[dataIdx];
   if (!song) return;
   activeDataIdx = dataIdx;
-
-  if (ytPlayer && ytPlayer.loadVideoById) {
-    ytPlayer.loadVideoById(song.youtubeId);
-  }
-
+  if (ytPlayer && ytPlayer.loadVideoById) ytPlayer.loadVideoById(song.youtubeId);
   document.getElementById('np-title').textContent = song.title || '—';
   document.getElementById('np-meta').textContent =
     [song.artist, song.year ? song.year + '년' : ''].filter(Boolean).join(' · ');
-
   const pos = playOrder.indexOf(dataIdx);
   if (pos !== -1) curIdx = pos;
-
   document.querySelectorAll('.song-item').forEach(el => {
     el.classList.toggle('active', parseInt(el.dataset.didx) === dataIdx);
   });
 }
 
 function playNext() {
-  if (!SONGS.length) return;
   curIdx = (curIdx + 1) % playOrder.length;
   playSong(playOrder[curIdx]);
 }
 
 function playPrev() {
-  if (!SONGS.length) return;
   curIdx = (curIdx - 1 + playOrder.length) % playOrder.length;
   playSong(playOrder[curIdx]);
 }
@@ -348,9 +326,8 @@ function playPrev() {
 function togglePlay() {
   if (!ytPlayer) return;
   const state = ytPlayer.getPlayerState();
-  if (state === YT.PlayerState.PLAYING) {
-    ytPlayer.pauseVideo();
-  } else {
+  if (state === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
+  else {
     if (activeDataIdx < 0) { buildOrder(); playSong(playOrder[0]); }
     else ytPlayer.playVideo();
   }
@@ -364,23 +341,18 @@ function toggleShuffle() {
   buildOrder(activeDataIdx);
 }
 
-/* ═══ Playlist Render ═══ */
 function renderPlaylist() {
-  const body = document.getElementById('pl-body');
   document.getElementById('song-count-badge').textContent = `${SONGS.length}곡`;
   document.getElementById('pl-label').textContent = `플레이리스트 · ${SONGS.length}곡`;
-
-  body.innerHTML = SONGS.map((s, i) => {
+  document.getElementById('pl-body').innerHTML = SONGS.map((s, i) => {
     const artHtml = s.albumArt
       ? `<img class="s-art" src="${esc(s.albumArt)}"
              onerror="this.outerHTML='<div class=\\'s-art-ph\\'>🎵</div>'" alt="">`
       : `<div class="s-art-ph">🎵</div>`;
-
     const notionBtn = s.notionUrl
       ? `<a class="notion-link" href="${esc(s.notionUrl)}" target="_blank"
            onclick="event.stopPropagation()" title="Notion 페이지 열기">📝</a>`
       : '';
-
     return `
       <div class="song-item" data-didx="${i}" onclick="playSong(${i})">
         <span class="s-num">${i + 1}</span>
@@ -396,11 +368,8 @@ function renderPlaylist() {
   }).join('');
 }
 
-/* ═══ Init ═══ */
 renderPlaylist();
 </script>
-
-<!-- YouTube IFrame API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
