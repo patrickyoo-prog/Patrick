@@ -299,6 +299,15 @@ const SONGS = [
     year: "2019",
     date: "2026-06-08",
     notionUrl: "https://patrickdongkiyoo.notion.site/A-Certain-Day-Xeuda-379705406ba681d4b231f52cd12118f5"
+  },
+  {
+    title: "Si dolce è il tormento",
+    artist: "Paolo Fresu ft. Uri Caine",
+    youtubeId: "6vnybkvRnq8",
+    albumArt: "https://i.ytimg.com/vi/6vnybkvRnq8/hqdefault.jpg",
+    year: "2006",
+    date: "2026-06-08",
+    notionUrl: "https://patrickdongkiyoo.notion.site/Si-dolce-e-il-tormento-Paolo-Fresu-ft-Uri-Caine-379705406ba681e79af9fdd3af31e796"
   }
 ];
 
@@ -341,8 +350,16 @@ window.onYouTubeIframeAPIReady = function() {
 
 function onPlayerReady() {
   document.getElementById('yt-placeholder').style.display = 'none';
-  buildOrder();
-  playSong(playOrder[0]);
+  const params = new URLSearchParams(window.location.search);
+  const startId = params.get('id');
+  const startDataIdx = startId ? SONGS.findIndex(s => s.youtubeId === startId) : -1;
+  if (startDataIdx >= 0) {
+    buildOrder(startDataIdx);
+    playSong(startDataIdx);
+  } else {
+    buildOrder();
+    playSong(playOrder[0]);
+  }
 }
 
 function onPlayerStateChange(event) {
