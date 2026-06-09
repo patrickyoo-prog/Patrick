@@ -824,7 +824,34 @@ Oh, I'll have another now`
 \uc608\uc804\uc5d4 \ud558\uc9c0 \uc54a\uc558\ub358 \uc2e4\uc218\ub4e4\uc774
 \uc544\uc8fc \uc870\uae08 \uc0dd\uae34 \uac83 \uac19\uc544`
   }
-];
+,
+  {
+    title: "All of Me",
+    artist: "The Piano Guys",
+    youtubeId: "9fAZIQ-vpdw",
+    albumArt: "https://img.youtube.com/vi/9fAZIQ-vpdw/maxresdefault.jpg",
+    year: "2012",
+    date: "2026-06-09",
+    notionUrl: "https://patrickdongkiyoo.notion.site/All-of-Me-The-Piano-Guys-37a705406ba68164aa1ef332373eaa95"
+  },
+  {
+    title: "\uadf8\ub0e5",
+    artist: "\uc6b0\uc8fc\ud788\ud53c",
+    youtubeId: "JiUJJ6Qh6J4",
+    albumArt: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/cb/f6/ad/cbf6ad27-3f95-b345-3009-7c95530ef5b2/single_more_cover.jpg/600x600bb.jpg",
+    year: "2017",
+    date: "2026-06-08",
+    notionUrl: "https://patrickdongkiyoo.notion.site/379705406ba68135af4ed84c08047237"
+  },
+  {
+    title: "Iihidattane.",
+    artist: "DEPAPEPE",
+    youtubeId: "YdZPDDbPHNo",
+    albumArt: "https://img.youtube.com/vi/YdZPDDbPHNo/maxresdefault.jpg",
+    year: "2015",
+    date: "2026-06-08",
+    notionUrl: "https://patrickdongkiyoo.notion.site/Iihidattane-DEPAPEPE-379705406ba6819a9b0ee7cb0ec2ad09"
+  }];
 
 let ytPlayer = null;
 let playOrder = [];
@@ -950,7 +977,7 @@ function updateLyricsPanel() {
     body.innerHTML = '<div class="lyrics-content">' + esc(song.lyrics) + '</div>';
   } else {
     const isInstrumental = !song.lyrics &&
-      (song.artist.includes('Khruangbin') || song.artist.includes('Chuck Mangione'));
+      (song.artist.includes('Khruangbin') || song.artist.includes('Chuck Mangione') || song.artist.includes('The Piano Guys') || song.artist.includes('DEPAPEPE'));
     body.innerHTML = '<div class="lyrics-empty">' +
       (isInstrumental
         ? '🎷 연주곡입니다 (가사 없음)'
