@@ -77,9 +77,44 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
 .ctrl:active { transform: scale(0.95); }
 .ctrl.icon-only { width: 40px; height: 40px; padding: 0; flex-shrink: 0; font-size: 16px; }
 .ctrl.shuffle-on { background: rgba(29,185,84,0.2); color: #1db954; }
+.ctrl.lyrics-on { background: rgba(29,185,84,0.2); color: #1db954; }
 .ctrl.flex-grow { flex: 1; }
 .ctrl#play-btn { flex: 0 0 48px; height: 48px; font-size: 18px; border-radius: 50%; background: #1db954; color: #000; }
 .ctrl#play-btn:hover { background: #1ed760; }
+/* Lyrics panel */
+.lyrics-panel {
+  display: none;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  max-height: 260px;
+  overflow-y: auto;
+  background: rgba(255,255,255,0.015);
+  flex-shrink: 0;
+}
+.lyrics-panel.visible { display: block; }
+.lyrics-panel::-webkit-scrollbar { width: 3px; }
+.lyrics-panel::-webkit-scrollbar-track { background: transparent; }
+.lyrics-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+.lyrics-header {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: #1db954; margin-bottom: 10px;
+}
+.lyrics-content {
+  font-size: 13px;
+  line-height: 2;
+  color: #bbb;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+.lyrics-empty {
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+  padding: 16px 0;
+  line-height: 1.8;
+}
 .divider { height: 1px; background: rgba(255,255,255,0.06); }
 .pl-section { flex: 1; overflow-y: auto; min-height: 0; padding-bottom: 20px; }
 .pl-header {
@@ -162,7 +197,13 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
   <button class="ctrl icon-only" onclick="playPrev()" title="이전 곡">⏮</button>
   <button class="ctrl" id="play-btn" onclick="togglePlay()" title="재생/일시정지">▶</button>
   <button class="ctrl flex-grow shuffle-on" id="shuffle-btn" onclick="toggleShuffle()">🔀 셔플</button>
+  <button class="ctrl icon-only" id="lyrics-btn" onclick="toggleLyrics()" title="가사 보기">📝</button>
   <button class="ctrl icon-only" onclick="playNext()" title="다음 곡">⏭</button>
+</div>
+
+<div class="lyrics-panel" id="lyrics-panel">
+  <div class="lyrics-header">📝 가사</div>
+  <div id="lyrics-body"><div class="lyrics-empty">재생 중인 곡을 선택해 주세요</div></div>
 </div>
 
 <div class="divider"></div>
@@ -190,7 +231,29 @@ const SONGS = [
     albumArt: "https://img.youtube.com/vi/jftp5DuZ9Ok/maxresdefault.jpg",
     year: "1999",
     date: "2026-06-05",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Rene-Liu-376705406ba68159a152db90760eabf1"
+    notionUrl: "https://patrickdongkiyoo.notion.site/Rene-Liu-376705406ba68159a152db90760eabf1",
+    lyrics: `栀子花 白花瓣
+落在我蓝色百褶裙上
+爱你 你轻声说
+我低下头 闻见一阵芬芳
+
+那个永恒的夜晚
+十七岁仲夏
+你吻了我的脸
+
+后来
+我总算学会了如何去爱
+可惜你早已远去消失在人海
+后来
+终于在眼泪中明白
+有些人 一旦错过就不再
+
+后来
+我总算学会了如何去爱
+可惜你早已远去消失在人海
+后来
+终于在眼泪中明白
+有些人 一旦错过就不再`
   },
   {
     title: "Like My Father",
@@ -199,7 +262,52 @@ const SONGS = [
     albumArt: "https://img.youtube.com/vi/GCWl50HQZIM/maxresdefault.jpg",
     year: "2021",
     date: "2026-06-06",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Like-My-Father-Jax-376705406ba6812cb194dfc3269c6fb9"
+    notionUrl: "https://patrickdongkiyoo.notion.site/Like-My-Father-Jax-376705406ba6812cb194dfc3269c6fb9",
+    lyrics: `Walk me down the aisle, daddy
+It's just a little while, daddy
+Daughters become lovers
+Oh, let's not forget about the others
+
+Your little girl got older
+I put away stuffed animals
+All those silly love songs
+Maybe the right one comes along
+
+And I hope he opens doors
+I hope he rakes the leaves
+I hope he's a better dancer
+Better than you and me
+
+Dance with me, dad, before you give me away
+Let's have this moment before they all say
+I'm giving you to someone else
+But I'll always be your baby girl
+Walk me down, walk me down, walk me down
+
+You walked me to school, daddy
+You wiped my tears away, daddy
+Now I'm the one getting married
+Who knew your little girl would carry
+
+Someone else's name now
+Someone else's last name
+Did I make you cry, daddy?
+I'll always be your baby
+
+And I hope he opens doors
+I hope he rakes the leaves
+I hope he's a better dancer
+Better than you and me
+
+Dance with me, dad, before you give me away
+Let's have this moment before they all say
+I'm giving you to someone else
+But I'll always be your baby girl
+Walk me down, walk me down, walk me down
+
+Oh, dad
+
+Walk me down, walk me down, walk me down`
   },
   {
     title: "Regent's Park",
@@ -208,7 +316,42 @@ const SONGS = [
     albumArt: "https://i.ytimg.com/vi/hfGcqETUZwI/maxresdefault.jpg",
     year: "2017",
     date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Regents-Park-Bruno-Major-379705406ba6814786d2ee73019418b4"
+    notionUrl: "https://patrickdongkiyoo.notion.site/Regents-Park-Bruno-Major-379705406ba6814786d2ee73019418b4",
+    lyrics: `I must have sent four hundred poems
+On the way you used to smile at me
+I used to write them for you daily
+But my thumbs are running dry lately
+No one wants to hear a song
+About the bitch that broke my heart
+I should have listened to my mama
+She saw through you from the start
+
+But now we're here
+In Regent's Park amongst the flowers
+And I wish it would rain
+'Cause in the Sun, you look so lovely
+That I'm falling for you over again
+Since I have nothing left to say
+That will make you change your mind
+I'll say goodbye on a beautiful spring day
+
+There was a place not too dissimilar to this one
+Where I first saw your face
+You look like home, sat all alone
+I should have found somebody cheaper to chase
+Tragically, nobody told me
+How expensive you would be
+I lost more than money, dear
+You knocked the swagger out of me
+
+But now we're here
+In Regent's Park amongst the flowers
+And I wish it would rain
+'Cause in the Sun, you look so lovely
+That I'm falling for you over again
+Since I have nothing left to say
+That will make you change your mind
+I'll say goodbye on a beautiful spring day`
   },
   {
     title: "Back To Me",
@@ -226,7 +369,43 @@ const SONGS = [
     albumArt: "https://i.ytimg.com/vi/eNiPuDEUQpQ/hqdefault.jpg",
     year: "2026",
     date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/AKMU-379705406ba6814b927feb6d75a14ab6"
+    notionUrl: "https://patrickdongkiyoo.notion.site/AKMU-379705406ba6814b927feb6d75a14ab6",
+    lyrics: `기쁨 다음에 슬픔이 오면
+그게 아름다운 마음이야
+밀어내지 말고 가까이해
+아주 소중한 돌이 될 거야
+
+햇빛 뒤에 그림자가 오면
+그건 너의 사랑스러운 모습이야
+환한 미소 짓지 않아도
+너를 사랑할 이유는 너무 많아
+
+네 웃음과 눈물이 함께라면
+
+이보다 더 좋을 순 없어
+흐린 날도 맑은 날도 추운 날도
+다 맞춰보면 퍼즐이 되잖아
+
+기쁨 다음에 슬픔이 오면
+그게 아름다운 마음이야
+두려워하지 말고 마주해봐
+빛나는 그림이 될 거야
+
+네 웃음과 눈물이 함께라면
+
+이보다 더 좋을 순 없어
+흐린 날도 맑은 날도 추운 날도
+다 맞춰보면 퍼즐이 되잖아
+
+이보다 더 뭐가 좋아
+슬프고 외로운 밤도
+찾아오지 않는 날도
+모든 게 더 소중하게 느껴질 거야
+
+네 웃음과 눈물이 함께라면
+
+기쁨 다음에 슬픔이 오면
+그게 아름다운 마음이야`
   },
   {
     title: "The Luckiest",
@@ -235,7 +414,47 @@ const SONGS = [
     albumArt: "https://i.ytimg.com/vi/ISMnfcnX6Ng/hqdefault.jpg",
     year: "2001",
     date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/The-Luckiest-Ben-Folds-379705406ba68140aa10f9eb9bb11255"
+    notionUrl: "https://patrickdongkiyoo.notion.site/The-Luckiest-Ben-Folds-379705406ba68140aa10f9eb9bb11255",
+    lyrics: `I don't get many things right the first time
+In fact, I am told that a lot
+Now I know all the wrong turns
+The stumbles and falls brought me here
+
+And where was I before the day
+That I first saw your lovely face?
+Now I see it every day
+And I know
+
+That I am, I am, I am
+The luckiest
+
+What if I'd been born fifty years before you
+In a house on the street where you live?
+Maybe I'd be outside as you passed on your bike
+Would I know?
+
+And in a white sea of eyes
+I see one pair that I recognize
+And I know
+
+That I am, I am, I am
+The luckiest
+
+I love you more than I have
+Ever found a way to say to you
+
+Next door there's an old man
+Who lived to his nineties
+And one day passed away in his sleep
+And his wife, she stayed for a couple of days
+And passed away
+
+I'm sorry, I know that's a strange way
+To tell you that I know we belong
+That I know
+
+That I am, I am, I am
+The luckiest`
   },
   {
     title: "Feels So Good",
@@ -271,7 +490,38 @@ const SONGS = [
     albumArt: "https://cdn.indistreet.app/uploads/1761302856159_5ad7b9e118.jpeg",
     year: "2019",
     date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/From-Me-To-You-Jungwoo-379705406ba68122904df2c1790562b9"
+    notionUrl: "https://patrickdongkiyoo.notion.site/From-Me-To-You-Jungwoo-379705406ba68122904df2c1790562b9",
+    lyrics: `나를 한 번만 더 달에 데려다줘
+고요하니 아늑하던 그곳
+내게 한 번만 더 별을 따다가 줘
+너의 영원한 체온으로 안아줘
+
+아픈 것은 아픈 대로
+예쁜 것은 예쁜 대로
+이제 모두 충분해서
+멀리멀리 떠나는 거지
+
+나는 구름의 강으로 가노니
+못다 한 말은 햇살에 띄워주세요
+
+나에게서 너에게로
+너로부터 나에게로
+애틋함이 그러해서
+멀리멀리 떠나가는 거지
+
+나는 햇살의 바다로 가노니
+남은 말은 바람에 속삭이세요
+
+아 나의 그리울 날들
+이젠 여기 두고 가네
+사랑스런 나의 친구
+이 시간들은 영원하여
+
+나는 구름의 강으로 가노니
+못다 한 말은 햇살에 띄워주세요
+남은 말은 바람에 속삭이세요
+
+나를 한 번만 더 달에 데려다줘`
   },
   {
     title: "기댈곳",
@@ -280,7 +530,49 @@ const SONGS = [
     albumArt: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e4/0e/d4/e40ed47b-9192-223d-100e-81b87f422c07/PSY_COVER_4000x4000.jpg/600x600bb.jpg",
     year: "2017",
     date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/PSY-379705406ba681d89d8efa8a0a595e8d"
+    notionUrl: "https://patrickdongkiyoo.notion.site/PSY-379705406ba681d89d8efa8a0a595e8d",
+    lyrics: `당신의 오늘 하루가
+힘들진 않았나요
+나의 하루는 그저 그랬어요
+괜찮은 척하기가
+혹시 힘들었나요
+난 그저 그냥 버틸만했어요
+솔직히 내 생각보다
+세상은 독해요
+솔직히 난 생각보다
+강하진 못해요
+하지만 힘들다고
+어리광 부릴 순 없어요
+버틸 거야 견딜 거야 괜찮을 거야
+하지만 버틴다고
+계속 버텨지지는 않네요
+그래요 나 기댈 곳이 필요해요
+그대여 나의 기댈 곳이 돼줘요
+
+당신의 고된 하루를
+누가 달래주나요
+다독여달라고 해도 소용없어요
+솔직히 난 세상보다
+한참 부족해요
+솔직히 난 세상만큼
+차갑진 못해요
+하지만 힘들다고
+어리광 부릴 순 없어요
+버틸 거야 견딜 거야 괜찮을 거야
+하지만 버틴다고
+계속 버텨지지는 않네요
+그래요 나 기댈 곳이 필요해요
+그대여 나의 기댈 곳이 돼줘요
+
+항상 난 세상이 날 알아주길 바래
+실은 나 세상이 날 안아주길 바래
+괜찮은 척하지만
+사는 게 맘 같지는 않네요
+저마다의 웃음 뒤엔 아픔이 있어
+하지만 아프다고
+소리 내고 싶지는 않아요
+그래요 나 기댈 곳이 필요해요
+그대여 나의 기댈 곳이 돼줘요`
   },
   {
     title: "月亮代表我的心 (The Moon Represents My Heart)",
@@ -289,7 +581,40 @@ const SONGS = [
     albumArt: "https://i.ytimg.com/vi/X2vGMsj33_0/hqdefault.jpg",
     year: "2004",
     date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/The-Moon-Represents-My-Heart-Zhao-Peng-379705406ba6815698c9fb031eb7fbed"
+    notionUrl: "https://patrickdongkiyoo.notion.site/The-Moon-Represents-My-Heart-Zhao-Peng-379705406ba6815698c9fb031eb7fbed",
+    lyrics: `你问我爱你有多深
+我爱你有几分
+我的情也真
+我的爱也真
+月亮代表我的心
+
+你问我爱你有多深
+我爱你有几分
+我的情不移
+我的爱不变
+月亮代表我的心
+
+轻轻的一个吻
+已经打动我的心
+深深的一段情
+叫我思念到如今
+
+你问我爱你有多深
+我爱你有几分
+你去想一想
+你去看一看
+月亮代表我的心
+
+轻轻的一个吻
+已经打动我的心
+深深的一段情
+叫我思念到如今
+
+你问我爱你有多深
+我爱你有几分
+你去想一想
+你去看一看
+月亮代表我的心`
   },
   {
     title: "어떤 날 (A Certain Day)",
@@ -298,7 +623,39 @@ const SONGS = [
     albumArt: "https://i.ytimg.com/vi/PGQp916ND98/hqdefault.jpg",
     year: "2019",
     date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/A-Certain-Day-Xeuda-379705406ba681d4b231f52cd12118f5"
+    notionUrl: "https://patrickdongkiyoo.notion.site/A-Certain-Day-Xeuda-379705406ba681d4b231f52cd12118f5",
+    lyrics: `구구구구 구슬픈 비둘기
+그마저 사라진 도시
+내뱉은 숨이 또 돌고 돌아
+다시 그대로 삼켜지네요
+
+냐아아앙 애처로운 밤이면
+외로운 고양이 소리에
+창문을 닫은 그 사람은
+외로운지도 모른 채 살아가네요
+
+희뿌연 하늘에는
+어떤 마음도 그릴 수 없지만
+반짝이는 저 불빛에
+그는 또다시 잊어버려요
+
+구구구구 구슬픈 비둘기
+그마저 사라진 도시
+내뱉은 숨이 또 돌고 돌아
+다시 그대로 삼켜지네요
+
+희뿌연 하늘에는
+어떤 마음도 그릴 수 없지만
+반짝이는 저 불빛에
+그는 또다시 잊어버려요
+
+구구구구 구슬픈 비둘기
+그마저 사라진 도시
+내뱉은 숨이 또 돌고 돌아
+다시 그대로 삼켜지네요
+
+진부하고 또 지루한 하루
+이렇게 또 흘러가네요`
   },
   {
     title: "Si dolce è il tormento",
@@ -307,34 +664,33 @@ const SONGS = [
     albumArt: "https://i.ytimg.com/vi/6vnybkvRnq8/hqdefault.jpg",
     year: "2006",
     date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Si-dolce-e-il-tormento-Paolo-Fresu-ft-Uri-Caine-379705406ba681e79af9fdd3af31e796"
-  },
-  {
-    title: "Iihidattane.",
-    artist: "DEPAPEPE",
-    youtubeId: "YdZPDDbPHNo",
-    albumArt: "https://img.youtube.com/vi/YdZPDDbPHNo/maxresdefault.jpg",
-    year: "2015",
-    date: "2026-06-09",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Iihidattane-DEPAPEPE-379705406ba6816e84e2e3352864168e"
-  },
-  {
-    title: "그냥",
-    artist: "우주히피",
-    youtubeId: "JiUJJ6Qh6J4",
-    albumArt: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/cb/f6/ad/cbf6ad27-3f95-b345-3009-7c95530ef5b2/single_more_cover.jpg/600x600bb.jpg",
-    year: "2017",
-    date: "2026-06-09",
-    notionUrl: "https://patrickdongkiyoo.notion.site/379705406ba6810681c4fc8be642d073"
-  },
-  {
-    title: "All of Me",
-    artist: "The Piano Guys (Jon Schmidt)",
-    youtubeId: "9fAZIQ-vpdw",
-    albumArt: "https://img.youtube.com/vi/9fAZIQ-vpdw/maxresdefault.jpg",
-    year: "2012",
-    date: "2026-06-09",
-    notionUrl: "https://patrickdongkiyoo.notion.site/All-of-Me-The-Piano-Guys-37a705406ba6811396fcc249092b8de4"
+    notionUrl: "https://patrickdongkiyoo.notion.site/Si-dolce-e-il-tormento-Paolo-Fresu-ft-Uri-Caine-379705406ba681e79af9fdd3af31e796",
+    lyrics: `Si dolce è il tormento
+Ch'in seno mi sta,
+Ch'io vivo contento
+Per cruda beltà.
+
+Nel ciel di bellezza
+S'accende un desir,
+Diletto e dolcezza
+Il duol fa sentir.
+
+Nel pianto è un diletto,
+Nel foco un geler,
+Il mel nel mio petto
+Fa l'aloe saper.
+
+La speme fallace
+Rivolgomi a pruova
+D'un'aspra tenace
+E cruda beltà.
+
+Se colei ch'adoro
+Mi niega il voler,
+Io vivo nel duolo
+Contento già.
+
+— Claudio Monteverdi (1624)`
   }
 ];
 
@@ -343,6 +699,7 @@ let playOrder = [];
 let curIdx = 0;
 let isShuffled = true;
 let activeDataIdx = -1;
+let lyricsVisible = false;
 
 function esc(s) {
   return String(s || '').replace(/[&<>"']/g,
@@ -409,6 +766,7 @@ function playSong(dataIdx) {
   document.querySelectorAll('.song-item').forEach(el => {
     el.classList.toggle('active', parseInt(el.dataset.didx) === dataIdx);
   });
+  updateLyricsPanel();
 }
 
 function playNext() {
@@ -439,6 +797,36 @@ function toggleShuffle() {
   buildOrder(activeDataIdx);
 }
 
+function toggleLyrics() {
+  lyricsVisible = !lyricsVisible;
+  const panel = document.getElementById('lyrics-panel');
+  const btn = document.getElementById('lyrics-btn');
+  panel.classList.toggle('visible', lyricsVisible);
+  btn.classList.toggle('lyrics-on', lyricsVisible);
+  if (lyricsVisible) updateLyricsPanel();
+}
+
+function updateLyricsPanel() {
+  const body = document.getElementById('lyrics-body');
+  if (activeDataIdx < 0) {
+    body.innerHTML = '<div class="lyrics-empty">재생 중인 곡을 선택해 주세요</div>';
+    return;
+  }
+  const song = SONGS[activeDataIdx];
+  if (!song) return;
+  if (song.lyrics) {
+    body.innerHTML = '<div class="lyrics-content">' + esc(song.lyrics) + '</div>';
+  } else {
+    const isInstrumental = !song.lyrics &&
+      (song.artist.includes('Khruangbin') || song.artist.includes('Chuck Mangione'));
+    body.innerHTML = '<div class="lyrics-empty">' +
+      (isInstrumental
+        ? '🎷 연주곡입니다 (가사 없음)'
+        : '📋 가사 정보를 준비 중입니다\n<span style="font-size:11px;color:#444">Notion 페이지에서 가사를 확인하세요</span>') +
+      '</div>';
+  }
+}
+
 function renderPlaylist() {
   document.getElementById('song-count-badge').textContent = `${SONGS.length}곡`;
   document.getElementById('pl-label').textContent = `플레이리스트 · ${SONGS.length}곡`;
@@ -451,6 +839,9 @@ function renderPlaylist() {
       ? `<a class="notion-link" href="${esc(s.notionUrl)}" target="_blank"
            onclick="event.stopPropagation()" title="Notion 페이지 열기">📝</a>`
       : '';
+    const lyricsTag = s.lyrics
+      ? `<span style="font-size:9px;color:#555;margin-left:2px;flex-shrink:0" title="가사 있음">♪</span>`
+      : '';
     return `
       <div class="song-item" data-didx="${i}" onclick="playSong(${i})">
         <span class="s-num">${i + 1}</span>
@@ -458,6 +849,7 @@ function renderPlaylist() {
         <div class="s-info">
           <div class="s-title-wrap">
             <span class="s-title">${esc(s.title)}</span>
+            ${lyricsTag}
             ${notionBtn}
           </div>
           <div class="s-sub">${esc(s.artist)}${s.year ? ' · ' + s.year : ''}</div>
