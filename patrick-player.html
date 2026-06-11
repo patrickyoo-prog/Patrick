@@ -1,1034 +1,645 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎵 Patrick's Music Player</title>
-<style>
-:root { color-scheme: dark; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #141414;
-  color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  max-width: 520px;
-  margin: 0 auto;
-}
-header {
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.04);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  position: sticky; top: 0; z-index: 10;
-}
-header .logo { font-size: 18px; }
-header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
-.badge {
-  margin-left: auto;
-  font-size: 10px;
-  background: rgba(29,185,84,0.2);
-  color: #1db954;
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-weight: 700;
-}
-.player-section { flex-shrink: 0; padding: 14px 14px 0; }
-#yt-container {
-  width: 100%;
-  aspect-ratio: 16/9;
-  background: #000;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-}
-#yt-player { width: 100%; height: 100%; }
-.yt-placeholder {
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  color: #444; gap: 8px; font-size: 13px;
-  position: absolute; top: 0; left: 0;
-  background: #111; z-index: 1;
-}
-.yt-placeholder .ph-icon { font-size: 36px; }
-.now-playing { padding: 10px 14px 2px; }
-.np-title {
-  font-size: 15px; font-weight: 700;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  letter-spacing: -0.01em;
-}
-.np-meta { font-size: 11px; color: #666; margin-top: 3px; }
-.controls {
-  padding: 10px 14px 12px;
-  display: flex; align-items: center; gap: 8px;
-}
-.ctrl {
-  border: none; cursor: pointer; border-radius: 8px;
-  font-size: 13px; display: flex; align-items: center; justify-content: center;
-  gap: 5px; transition: background 0.12s; color: #fff;
-  background: rgba(255,255,255,0.07); padding: 8px 12px;
-}
-.ctrl:hover { background: rgba(255,255,255,0.13); }
-.ctrl:active { transform: scale(0.95); }
-.ctrl.icon-only { width: 40px; height: 40px; padding: 0; flex-shrink: 0; font-size: 16px; }
-.ctrl.shuffle-on { background: rgba(29,185,84,0.2); color: #1db954; }
-.ctrl.lyrics-on { background: rgba(29,185,84,0.2); color: #1db954; }
-.ctrl.flex-grow { flex: 1; }
-.ctrl#play-btn { flex: 0 0 48px; height: 48px; font-size: 18px; border-radius: 50%; background: #1db954; color: #000; }
-.ctrl#play-btn:hover { background: #1ed760; }
-/* Lyrics panel */
-.lyrics-panel {
-  display: none;
-  padding: 14px 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  max-height: 260px;
-  overflow-y: auto;
-  background: rgba(255,255,255,0.015);
-  flex-shrink: 0;
-}
-.lyrics-panel.visible { display: block; }
-.lyrics-panel::-webkit-scrollbar { width: 3px; }
-.lyrics-panel::-webkit-scrollbar-track { background: transparent; }
-.lyrics-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-.lyrics-header {
-  font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  color: #1db954; margin-bottom: 10px;
-}
-.lyrics-content {
-  font-size: 13px;
-  line-height: 2;
-  color: #bbb;
-  white-space: pre-wrap;
-  word-break: keep-all;
-}
-.lyrics-empty {
-  font-size: 12px;
-  color: #555;
-  text-align: center;
-  padding: 16px 0;
-  line-height: 1.8;
-}
-.divider { height: 1px; background: rgba(255,255,255,0.06); }
-.pl-section { flex: 1; overflow-y: auto; min-height: 0; padding-bottom: 20px; }
-.pl-header {
-  padding: 10px 14px 6px;
-  font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.1em; color: #555;
-  position: sticky; top: 0; background: #141414; z-index: 2;
-}
-.song-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 14px; cursor: pointer;
-  transition: background 0.1s;
-}
-.song-item:hover { background: rgba(255,255,255,0.04); }
-.song-item.active {
-  background: rgba(29,185,84,0.08);
-  border-left: 2px solid #1db954;
-  padding-left: 12px;
-}
-.s-num { font-size: 11px; color: #555; width: 16px; text-align: right; flex-shrink: 0; }
-.song-item.active .s-num { color: #1db954; }
-.s-art {
-  width: 40px; height: 40px; border-radius: 6px;
-  background: #222; object-fit: cover; flex-shrink: 0;
-}
-.s-art-ph {
-  width: 40px; height: 40px; border-radius: 6px;
-  background: #222; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-}
-.s-info { flex: 1; min-width: 0; }
-.s-title-wrap {
-  display: flex; align-items: center; gap: 4px;
-  white-space: nowrap; overflow: hidden;
-}
-.s-title {
-  font-size: 13px; font-weight: 500;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  min-width: 0;
-}
-.song-item.active .s-title { color: #1db954; }
-.notion-link {
-  flex-shrink: 0;
-  font-size: 11px; color: #444;
-  text-decoration: none;
-  padding: 1px 3px; border-radius: 3px;
-  transition: color 0.12s, background 0.12s;
-  line-height: 1;
-}
-.notion-link:hover { color: #888; background: rgba(255,255,255,0.07); }
-.song-item.active .notion-link { color: #1db954; opacity: 0.7; }
-.s-sub { font-size: 11px; color: #666; margin-top: 2px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patrick's Daily Music Player - Auto-Sync</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .player-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .loading-indicator {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        .album-art {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .song-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .song-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+
+        .song-artist {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .song-year {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .sync-status {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .sync-status.synced {
+            color: #4caf50;
+        }
+
+        .sync-status.syncing {
+            color: #ff9800;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #prev-btn, #next-btn {
+            font-size: 24px;
+        }
+
+        #play-btn {
+            font-size: 40px;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .info-section h3 {
+            font-size: 14px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .volume-control input {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            background: #e0e0e0;
+        }
+
+        .volume-control input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .volume-control input::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+            padding: 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            background: #f5f5f5;
+            color: #333;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .action-buttons button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .action-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #notion-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        #notion-btn:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #653a91 100%);
+        }
+
+        .youtube-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .youtube-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #ff0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .youtube-link a:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+
+        .shuffle-repeat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .shuffle-repeat button {
+            padding: 8px 12px;
+            font-size: 12px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            color: #666;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .shuffle-repeat button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 600px) {
+            .player-container {
+                padding: 30px 20px;
+            }
+
+            .song-title {
+                font-size: 20px;
+            }
+
+            .controls {
+                gap: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<header>
-  <span class="logo">🎵</span>
-  <h1>Patrick's Music Player</h1>
-  <span class="badge" id="song-count-badge">0곡</span>
-</header>
-
-<div class="player-section">
-  <div id="yt-container">
-    <div class="yt-placeholder" id="yt-placeholder">
-      <span class="ph-icon">🎵</span>
-      <span>곡을 선택하거나 재생 버튼을 누르세요</span>
-    </div>
-    <div id="yt-player"></div>
-  </div>
-</div>
-
-<div class="now-playing">
-  <div class="np-title" id="np-title">Patrick's Daily Music</div>
-  <div class="np-meta" id="np-meta">셔플 재생 준비 중...</div>
-</div>
-
-<div class="controls">
-  <button class="ctrl icon-only" onclick="playPrev()" title="이전 곡">⏮</button>
-  <button class="ctrl" id="play-btn" onclick="togglePlay()" title="재생/일시정지">▶</button>
-  <button class="ctrl flex-grow shuffle-on" id="shuffle-btn" onclick="toggleShuffle()">🔀 셔플</button>
-  <button class="ctrl icon-only" id="lyrics-btn" onclick="toggleLyrics()" title="가사 보기">📝</button>
-  <button class="ctrl icon-only" onclick="playNext()" title="다음 곡">⏭</button>
-</div>
-
-<div class="lyrics-panel" id="lyrics-panel">
-  <div class="lyrics-header">📝 가사</div>
-  <div id="lyrics-body"><div class="lyrics-empty">재생 중인 곡을 선택해 주세요</div></div>
-</div>
-
-<div class="divider"></div>
-
-<div class="pl-section">
-  <div class="pl-header" id="pl-label">플레이리스트</div>
-  <div id="pl-body"></div>
-</div>
-
-<script>
-const SONGS = [
-  {
-    title: "White Gloves",
-    artist: "Khruangbin",
-    youtubeId: "wJzoos4rE_o",
-    albumArt: "https://img.youtube.com/vi/wJzoos4rE_o/maxresdefault.jpg",
-    year: "2024",
-    date: "2026-06-05",
-    notionUrl: "https://patrickdongkiyoo.notion.site/White-Gloves-Khruangbin-376705406ba6811ca874d1d3464d6c2a"
-  },
-  {
-    title: "后来 (나중에야)",
-    artist: "刘若英 (Rene Liu)",
-    youtubeId: "jftp5DuZ9Ok",
-    albumArt: "https://img.youtube.com/vi/jftp5DuZ9Ok/maxresdefault.jpg",
-    year: "1999",
-    date: "2026-06-05",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Rene-Liu-376705406ba68159a152db90760eabf1",
-    lyrics: `栀子花 白花瓣
-落在我蓝色百褶裙上
-爱你 你轻声说
-我低下头 闻见一阵芬芳
-
-那个永恒的夜晚
-十七岁仲夏
-你吻了我的脸
-
-后来
-我总算学会了如何去爱
-可惜你早已远去消失在人海
-后来
-终于在眼泪中明白
-有些人 一旦错过就不再
-
-后来
-我总算学会了如何去爱
-可惜你早已远去消失在人海
-后来
-终于在眼泪中明白
-有些人 一旦错过就不再`
-  },
-  {
-    title: "Like My Father",
-    artist: "Jax",
-    youtubeId: "GCWl50HQZIM",
-    albumArt: "https://img.youtube.com/vi/GCWl50HQZIM/maxresdefault.jpg",
-    year: "2021",
-    date: "2026-06-06",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Like-My-Father-Jax-376705406ba6812cb194dfc3269c6fb9",
-    lyrics: `Walk me down the aisle, daddy
-It's just a little while, daddy
-Daughters become lovers
-Oh, let's not forget about the others
-
-Your little girl got older
-I put away stuffed animals
-All those silly love songs
-Maybe the right one comes along
-
-And I hope he opens doors
-I hope he rakes the leaves
-I hope he's a better dancer
-Better than you and me
-
-Dance with me, dad, before you give me away
-Let's have this moment before they all say
-I'm giving you to someone else
-But I'll always be your baby girl
-Walk me down, walk me down, walk me down
-
-You walked me to school, daddy
-You wiped my tears away, daddy
-Now I'm the one getting married
-Who knew your little girl would carry
-
-Someone else's name now
-Someone else's last name
-Did I make you cry, daddy?
-I'll always be your baby
-
-And I hope he opens doors
-I hope he rakes the leaves
-I hope he's a better dancer
-Better than you and me
-
-Dance with me, dad, before you give me away
-Let's have this moment before they all say
-I'm giving you to someone else
-But I'll always be your baby girl
-Walk me down, walk me down, walk me down
-
-Oh, dad
-
-Walk me down, walk me down, walk me down`
-  },
-  {
-    title: "Regent's Park",
-    artist: "Bruno Major",
-    youtubeId: "hfGcqETUZwI",
-    albumArt: "https://i.ytimg.com/vi/hfGcqETUZwI/maxresdefault.jpg",
-    year: "2017",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Regents-Park-Bruno-Major-379705406ba6814786d2ee73019418b4",
-    lyrics: `I must have sent four hundred poems
-On the way you used to smile at me
-I used to write them for you daily
-But my thumbs are running dry lately
-No one wants to hear a song
-About the bitch that broke my heart
-I should have listened to my mama
-She saw through you from the start
-
-But now we're here
-In Regent's Park amongst the flowers
-And I wish it would rain
-'Cause in the Sun, you look so lovely
-That I'm falling for you over again
-Since I have nothing left to say
-That will make you change your mind
-I'll say goodbye on a beautiful spring day
-
-There was a place not too dissimilar to this one
-Where I first saw your face
-You look like home, sat all alone
-I should have found somebody cheaper to chase
-Tragically, nobody told me
-How expensive you would be
-I lost more than money, dear
-You knocked the swagger out of me
-
-But now we're here
-In Regent's Park amongst the flowers
-And I wish it would rain
-'Cause in the Sun, you look so lovely
-That I'm falling for you over again
-Since I have nothing left to say
-That will make you change your mind
-I'll say goodbye on a beautiful spring day`
-  },
-  {
-    title: "Back To Me",
-    artist: "The Rose (더 로즈)",
-    youtubeId: "haX6ENq0s0M",
-    albumArt: "https://i.ytimg.com/vi/haX6ENq0s0M/maxresdefault.jpg",
-    year: "2023",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Back-To-Me-The-Rose-379705406ba681839979ec4baafc7b66"
-  },
-  {
-    title: "기쁨, 슬픔, 아름다운 마음",
-    artist: "AKMU (악동뮤지션)",
-    youtubeId: "eNiPuDEUQpQ",
-    albumArt: "https://i.ytimg.com/vi/eNiPuDEUQpQ/hqdefault.jpg",
-    year: "2026",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/AKMU-379705406ba6814b927feb6d75a14ab6",
-    lyrics: `기쁨 다음에 슬픔이 오면
-그게 아름다운 마음이야
-밀어내지 말고 가까이해
-아주 소중한 돌이 될 거야
-
-햇빛 뒤에 그림자가 오면
-그건 너의 사랑스러운 모습이야
-환한 미소 짓지 않아도
-너를 사랑할 이유는 너무 많아
-
-네 웃음과 눈물이 함께라면
-
-이보다 더 좋을 순 없어
-흐린 날도 맑은 날도 추운 날도
-다 맞춰보면 퍼즐이 되잖아
-
-기쁨 다음에 슬픔이 오면
-그게 아름다운 마음이야
-두려워하지 말고 마주해봐
-빛나는 그림이 될 거야
-
-네 웃음과 눈물이 함께라면
-
-이보다 더 좋을 순 없어
-흐린 날도 맑은 날도 추운 날도
-다 맞춰보면 퍼즐이 되잖아
-
-이보다 더 뭐가 좋아
-슬프고 외로운 밤도
-찾아오지 않는 날도
-모든 게 더 소중하게 느껴질 거야
-
-네 웃음과 눈물이 함께라면
-
-기쁨 다음에 슬픔이 오면
-그게 아름다운 마음이야`
-  },
-  {
-    title: "The Luckiest",
-    artist: "Ben Folds",
-    youtubeId: "ISMnfcnX6Ng",
-    albumArt: "https://i.ytimg.com/vi/ISMnfcnX6Ng/hqdefault.jpg",
-    year: "2001",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/The-Luckiest-Ben-Folds-379705406ba68140aa10f9eb9bb11255",
-    lyrics: `I don't get many things right the first time
-In fact, I am told that a lot
-Now I know all the wrong turns
-The stumbles and falls brought me here
-
-And where was I before the day
-That I first saw your lovely face?
-Now I see it every day
-And I know
-
-That I am, I am, I am
-The luckiest
-
-What if I'd been born fifty years before you
-In a house on the street where you live?
-Maybe I'd be outside as you passed on your bike
-Would I know?
-
-And in a white sea of eyes
-I see one pair that I recognize
-And I know
-
-That I am, I am, I am
-The luckiest
-
-I love you more than I have
-Ever found a way to say to you
-
-Next door there's an old man
-Who lived to his nineties
-And one day passed away in his sleep
-And his wife, she stayed for a couple of days
-And passed away
-
-I'm sorry, I know that's a strange way
-To tell you that I know we belong
-That I know
-
-That I am, I am, I am
-The luckiest`
-  },
-  {
-    title: "Feels So Good",
-    artist: "Chuck Mangione",
-    youtubeId: "WPZHdldAMHg",
-    albumArt: "https://i.ytimg.com/vi/WPZHdldAMHg/hqdefault.jpg",
-    year: "1977",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Feels-So-Good-Chuck-Mangione-379705406ba681e0900cc389865dd152"
-  },
-  {
-    title: "Bite the Bullet",
-    artist: "Little Majorette",
-    youtubeId: "R0FdMyu6jfw",
-    albumArt: "https://i.ytimg.com/vi/R0FdMyu6jfw/hqdefault.jpg",
-    year: "2010",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Bite-the-Bullet-Little-Majorette-379705406ba681a08bddc95a032a199c"
-  },
-  {
-    title: "보리차 (Barley Tea)",
-    artist: "천용성 (Chun Yongsung)",
-    youtubeId: "A9nOk8o4QfU",
-    albumArt: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/59/93/bb/5993bb4e-3c1f-2aab-0a49-d8a5d1965664/8809851794012.jpg/600x600bb.jpg",
-    year: "2022",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Barley-Tea-Chun-Yongsung-379705406ba681e3881ce506a58851aa"
-  },
-  {
-    title: "나에게서 당신에게 (From Me To You)",
-    artist: "정우 (Jungwoo)",
-    youtubeId: "zRqp4ESj3vc",
-    albumArt: "https://cdn.indistreet.app/uploads/1761302856159_5ad7b9e118.jpeg",
-    year: "2019",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/From-Me-To-You-Jungwoo-379705406ba68122904df2c1790562b9",
-    lyrics: `나를 한 번만 더 달에 데려다줘
-고요하니 아늑하던 그곳
-내게 한 번만 더 별을 따다가 줘
-너의 영원한 체온으로 안아줘
-
-아픈 것은 아픈 대로
-예쁜 것은 예쁜 대로
-이제 모두 충분해서
-멀리멀리 떠나는 거지
-
-나는 구름의 강으로 가노니
-못다 한 말은 햇살에 띄워주세요
-
-나에게서 너에게로
-너로부터 나에게로
-애틋함이 그러해서
-멀리멀리 떠나가는 거지
-
-나는 햇살의 바다로 가노니
-남은 말은 바람에 속삭이세요
-
-아 나의 그리울 날들
-이젠 여기 두고 가네
-사랑스런 나의 친구
-이 시간들은 영원하여
-
-나는 구름의 강으로 가노니
-못다 한 말은 햇살에 띄워주세요
-남은 말은 바람에 속삭이세요
-
-나를 한 번만 더 달에 데려다줘`
-  },
-  {
-    title: "기댈곳",
-    artist: "싸이 (PSY)",
-    youtubeId: "i4rauVTzuc0",
-    albumArt: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e4/0e/d4/e40ed47b-9192-223d-100e-81b87f422c07/PSY_COVER_4000x4000.jpg/600x600bb.jpg",
-    year: "2017",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/PSY-379705406ba681d89d8efa8a0a595e8d",
-    lyrics: `당신의 오늘 하루가
-힘들진 않았나요
-나의 하루는 그저 그랬어요
-괜찮은 척하기가
-혹시 힘들었나요
-난 그저 그냥 버틸만했어요
-솔직히 내 생각보다
-세상은 독해요
-솔직히 난 생각보다
-강하진 못해요
-하지만 힘들다고
-어리광 부릴 순 없어요
-버틸 거야 견딜 거야 괜찮을 거야
-하지만 버틴다고
-계속 버텨지지는 않네요
-그래요 나 기댈 곳이 필요해요
-그대여 나의 기댈 곳이 돼줘요
-
-당신의 고된 하루를
-누가 달래주나요
-다독여달라고 해도 소용없어요
-솔직히 난 세상보다
-한참 부족해요
-솔직히 난 세상만큼
-차갑진 못해요
-하지만 힘들다고
-어리광 부릴 순 없어요
-버틸 거야 견딜 거야 괜찮을 거야
-하지만 버틴다고
-계속 버텨지지는 않네요
-그래요 나 기댈 곳이 필요해요
-그대여 나의 기댈 곳이 돼줘요
-
-항상 난 세상이 날 알아주길 바래
-실은 나 세상이 날 안아주길 바래
-괜찮은 척하지만
-사는 게 맘 같지는 않네요
-저마다의 웃음 뒤엔 아픔이 있어
-하지만 아프다고
-소리 내고 싶지는 않아요
-그래요 나 기댈 곳이 필요해요
-그대여 나의 기댈 곳이 돼줘요`
-  },
-  {
-    title: "月亮代表我的心 (The Moon Represents My Heart)",
-    artist: "Zhao Peng (赵鹏)",
-    youtubeId: "X2vGMsj33_0",
-    albumArt: "https://i.ytimg.com/vi/X2vGMsj33_0/hqdefault.jpg",
-    year: "2004",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/The-Moon-Represents-My-Heart-Zhao-Peng-379705406ba6815698c9fb031eb7fbed",
-    lyrics: `你问我爱你有多深
-我爱你有几分
-我的情也真
-我的爱也真
-月亮代表我的心
-
-你问我爱你有多深
-我爱你有几分
-我的情不移
-我的爱不变
-月亮代表我的心
-
-轻轻的一个吻
-已经打动我的心
-深深的一段情
-叫我思念到如今
-
-你问我爱你有多深
-我爱你有几分
-你去想一想
-你去看一看
-月亮代表我的心
-
-轻轻的一个吻
-已经打动我的心
-深深的一段情
-叫我思念到如今
-
-你问我爱你有多深
-我爱你有几分
-你去想一想
-你去看一看
-月亮代表我的心`
-  },
-  {
-    title: "어떤 날 (A Certain Day)",
-    artist: "쓰다 (Xeuda)",
-    youtubeId: "PGQp916ND98",
-    albumArt: "https://i.ytimg.com/vi/PGQp916ND98/hqdefault.jpg",
-    year: "2019",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/A-Certain-Day-Xeuda-379705406ba681d4b231f52cd12118f5",
-    lyrics: `구구구구 구슬픈 비둘기
-그마저 사라진 도시
-내뱉은 숨이 또 돌고 돌아
-다시 그대로 삼켜지네요
-
-냐아아앙 애처로운 밤이면
-외로운 고양이 소리에
-창문을 닫은 그 사람은
-외로운지도 모른 채 살아가네요
-
-희뿌연 하늘에는
-어떤 마음도 그릴 수 없지만
-반짝이는 저 불빛에
-그는 또다시 잊어버려요
-
-구구구구 구슬픈 비둘기
-그마저 사라진 도시
-내뱉은 숨이 또 돌고 돌아
-다시 그대로 삼켜지네요
-
-희뿌연 하늘에는
-어떤 마음도 그릴 수 없지만
-반짝이는 저 불빛에
-그는 또다시 잊어버려요
-
-구구구구 구슬픈 비둘기
-그마저 사라진 도시
-내뱉은 숨이 또 돌고 돌아
-다시 그대로 삼켜지네요
-
-진부하고 또 지루한 하루
-이렇게 또 흘러가네요`
-  },
-  {
-    title: "Si dolce è il tormento",
-    artist: "Paolo Fresu ft. Uri Caine",
-    youtubeId: "6vnybkvRnq8",
-    albumArt: "https://i.ytimg.com/vi/6vnybkvRnq8/hqdefault.jpg",
-    year: "2006",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Si-dolce-e-il-tormento-Paolo-Fresu-ft-Uri-Caine-379705406ba681e79af9fdd3af31e796",
-    lyrics: `Si dolce è il tormento
-Ch'in seno mi sta,
-Ch'io vivo contento
-Per cruda beltà.
-
-Nel ciel di bellezza
-S'accende un desir,
-Diletto e dolcezza
-Il duol fa sentir.
-
-Nel pianto è un diletto,
-Nel foco un geler,
-Il mel nel mio petto
-Fa l'aloe saper.
-
-La speme fallace
-Rivolgomi a pruova
-D'un'aspra tenace
-E cruda beltà.
-
-Se colei ch'adoro
-Mi niega il voler,
-Io vivo nel duolo
-Contento già.
-
-— Claudio Monteverdi (1624)`
-  },
-  {
-    title: "Whiskey and Morphine",
-    artist: "Alexander Jean",
-    youtubeId: "ACDf9fhpuqo",
-    albumArt: "https://i.ytimg.com/vi/ACDf9fhpuqo/hqdefault.jpg",
-    year: "2016",
-    date: "2026-06-09",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Whiskey-and-Morphine-Alexander-Jean-37a705406ba68138829fc722a2e6e7d0",
-    lyrics: `I'm wanted for addiction
-She's faining for a drill
-We've been screaming for attention
-Any little thing to numb this hell
-
-Oh, every now and then I like to get me some, to get me some
-Oh, even though it's just a phase
-Oh, I feel like I've been in a hit and run
-This shit ain't fun
-I'm still here and you've got in in my aim
-
-I've got whiskey and morphine
-Rushing through me
-The stairs are moving quicker than I'm running
-And I'm tripping over absolutely nothing
-Thanks to whiskey and morphine
-I'm up in it away, up in it away, up in it away
-
-I'll finish every bottle
-Till I'm empty on the floor
-Then do it all again tomorrow
-Any little thing to numb this hell
-
-Oh, every now and then I like to get me some, to get me some
-Oh, even though it's just a phase
-Oh, I feel like I've been swallowing a loaded gun
-This shit ain't fun
-I'm on the verge of fainting with my brains
-
-Help me, whiskey and morphine
-Rushing through me
-The stairs are moving quicker than I'm running
-And I'm tripping over absolutely nothing
-Thanks to whiskey and morphine
-I'm up in it away, up in it away, up in it away
-
-I'm high
-And there's no coming down
-
-Oh, I'll have another
-Oh, I'll have another
-Oh, I'll have another now
-Oh, I'll have another
-Oh, I'll have another
-Oh, I'll have another now
-
-I'm wanted for addiction
-She's faining for a drill
-
-I've got whiskey and morphine
-Rushing through me
-The stairs are moving quicker than I'm running
-And I'm tripping over absolutely nothing
-Thanks to whiskey and morphine
-I'm up in it away, up in it away, up in it away
-
-Oh, I'll have another
-Oh, I'll have another
-Oh, I'll have another now
-Oh, I'll have another
-Oh, I'll have another
-Oh, I'll have another now`
-  },
-  {
-    title: "\uc694\uc998 \ub0b4 \ubaa8\uc2b5",
-    artist: "\uc724\ub3c4\ud604 (feat. \ud0c0\ube14\ub85c, \ucf00\uc774\uc70c)",
-    youtubeId: "M9jYuBrX0eU",
-    albumArt: "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/cd/e6/30/cde630cf-b651-1b4f-e17f-32a52a92d423/20UMGIM02352.rgb.jpg/600x600bb.jpg",
-    year: "2014",
-    date: "2026-06-09",
-    notionUrl: "https://patrickdongkiyoo.notion.site/How-I-Look-These-Days-Yoon-Do-Hyun-37a705406ba6816c9d02f93d685d1e3e",
-    lyrics: `\uc694\uc998 \ub0b4 \ubaa8\uc2b5 \uc870\uae08 \uc774\uc0c1\ud574
-\uac00\ub054\uc529 \uba4d\ud574\uc9c0\uae30\ub3c4 \ud558\uace0
-\uc608\uc804\uc5d4 \ud558\uc9c0 \uc54a\uc558\ub358 \uc2e4\uc218\ub4e4\uc774
-\uc544\uc8fc \uc870\uae08 \uc0dd\uae34 \uac83 \uac19\uc544
-
-\ub0b4\ub824\uc57c \ud560 \uc815\uac70\uc7a5 \uc9c0\ub098
-\ud55c\ucc38\uc744 \ub354 \uac14\uc5c8\uc9c0
-\uadf8\ub54c\uc11c\uc57c \uc54c\uc544\ucc28\ub9ac\uace0
-\ub4a4\ub3cc\uc544 \uac78\uc5b4\uc624\uba70
-
-\uc694\uc998 \ub0b4 \ubaa8\uc2b5\uc774 \uc65c \uc774\ub7ec\uc9c0
-\ub108\ub97c \ubcf4\ub0b4\uc8fc\uace0 \ud63c\uc790 \uc788\ub294\ub370
-\uc774\ub807\uac8c \ud798\uc774 \ub4dc\ub294 \uac74\uc9c0
-\uc54c \uc218\uac00 \uc5c6\uc5b4 \ud63c\ub780\uc2a4\ub7ec\uc6cc
-\uc694\uc998 \ub0b4 \ubaa8\uc2b5\uc774
-
-\uc775\uc219\ud574\uc9c8 \uc904 \uc54c\uc558\uc5c8\ub294\ub370
-\uc2dc\uac04\uc774 \uc9c0\ub098\uba74 \uad1c\ucc2e\uc544\uc9c8 \uc904 \uc54c\uc558\ub294\ub370
-\uc65c \uc790\uafb8\ub9cc \ub5a0\uc624\ub974\ub294 \uac74\uc9c0
-\uadf8 \uc0ac\ub78c, \uadf8 \uae30\uc5b5\uc774
-
-\uc694\uc998 \ub0b4 \ubaa8\uc2b5\uc774 \uc65c \uc774\ub7ec\uc9c0
-\ub108\ub97c \ubcf4\ub0b4\uc8fc\uace0 \ud63c\uc790 \uc788\ub294\ub370
-\uc774\ub807\uac8c \ud798\uc774 \ub4dc\ub294 \uac74\uc9c0
-\uc54c \uc218\uac00 \uc5c6\uc5b4 \ud63c\ub780\uc2a4\ub7ec\uc6cc
-\uc694\uc998 \ub0b4 \ubaa8\uc2b5\uc774
-
-\uc194\uc9c1\ud558\uac8c \ub9d0\ud574\ubcfc\uac8c \ub098 \uc0ac\uc2e4 \ub9ce\uc774 \ud798\ub4e4\uc5b4
-\uac49\uc73c\ub860 \uc6c3\uace0 \uc788\uc9c0\ub9cc \uc18d\uc73c\ub860 \ud130\uc9c8 \uac83 \uac19\uc544
-\uc8fc\uc704\uc5d0\uc120 \ub2e4 \uc78a\uc73c\ub77c\uace0 \uc0c8 \ucd9c\ubc1c \ud558\ub77c\uace0 \ud558\ub294\ub370
-\uadf8 \ub9d0\uc774 \ub9de\ub2e4\ub294 \uac78 \uc54c\uba74\uc11c\ub3c4 \uc27d\uc9c0 \uc54a\uc544
-
-\uc5ec\uc804\ud788 \ub124 \ubc88\ud638\uac00 \ud3f0 \uc548\uc5d0 \uc800\uc7a5\ub3fc \uc788\uace0
-\uc5ec\uc804\ud788 \ub124\uac00 \ubcf4\ub0b4\uc900 \uba54\uc138\uc9c0\ub4e4 \uc9c0\uc6b0\uc9c0 \ubabb\ud588\uace0
-\uc798 \uc788\ub0d0\uace0 \uc5f0\ub77d\ud558\uba74 \uc5b4\ub5a8\uae4c \ud558\ub2e4\uac00\ub3c4
-\uadf8\uac8c \ubbf8\ub828\uc778 \uac83 \uac19\uc544\uc11c \uadf8\ub0e5 \uba48\ucd94\uace0 \ub9d0\uc544
-
-\uc694\uc998 \ub0b4 \ubaa8\uc2b5\uc774 \uc65c \uc774\ub7ec\uc9c0
-\ub108\ub97c \ubcf4\ub0b4\uc8fc\uace0 \ud63c\uc790 \uc788\ub294\ub370
-\uc774\ub807\uac8c \ud798\uc774 \ub4dc\ub294 \uac74\uc9c0
-\uc54c \uc218\uac00 \uc5c6\uc5b4 \ud63c\ub780\uc2a4\ub7ec\uc6cc
-\uc694\uc998 \ub0b4 \ubaa8\uc2b5\uc774
-
-\ub0b4\uac00 \uba3c\uc800 \ub5a0\ub098\ubcf4\ub0c8\uc796\uc544
-\ub0b4\uac00 \ud3ec\uae30\ud55c \uac70\uc796\uc544
-\uadf8\ub7f0\ub370 \uc65c \uc774\ub807\uac8c
-\uadf8\ub9ac\uc6b4 \uac74\uc9c0
-
-\uc694\uc998 \ub0b4 \ubaa8\uc2b5 \uc870\uae08 \uc774\uc0c1\ud574
-\uac00\ub054\uc529 \uba4d\ud574\uc9c0\uae30\ub3c4 \ud558\uace0
-\uc608\uc804\uc5d4 \ud558\uc9c0 \uc54a\uc558\ub358 \uc2e4\uc218\ub4e4\uc774
-\uc544\uc8fc \uc870\uae08 \uc0dd\uae34 \uac83 \uac19\uc544`
-  }
-,
-  {
-    title: "All of Me",
-    artist: "The Piano Guys",
-    youtubeId: "9fAZIQ-vpdw",
-    albumArt: "https://img.youtube.com/vi/9fAZIQ-vpdw/maxresdefault.jpg",
-    year: "2012",
-    date: "2026-06-09",
-    notionUrl: "https://patrickdongkiyoo.notion.site/All-of-Me-The-Piano-Guys-37a705406ba68164aa1ef332373eaa95"
-  },
-  {
-    title: "\uadf8\ub0e5",
-    artist: "\uc6b0\uc8fc\ud788\ud53c",
-    youtubeId: "JiUJJ6Qh6J4",
-    albumArt: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/cb/f6/ad/cbf6ad27-3f95-b345-3009-7c95530ef5b2/single_more_cover.jpg/600x600bb.jpg",
-    year: "2017",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/379705406ba68135af4ed84c08047237"
-  },
-  {
-    title: "Iihidattane.",
-    artist: "DEPAPEPE",
-    youtubeId: "YdZPDDbPHNo",
-    albumArt: "https://img.youtube.com/vi/YdZPDDbPHNo/maxresdefault.jpg",
-    year: "2015",
-    date: "2026-06-08",
-    notionUrl: "https://patrickdongkiyoo.notion.site/Iihidattane-DEPAPEPE-379705406ba6819a9b0ee7cb0ec2ad09"
-  },
-  {
-    title: "(You are) more than paradise",
-    artist: "port of notes",
-    youtubeId: "7gzUCDhC-Ns",
-    albumArt: "https://i.ytimg.com/vi/7gzUCDhC-Ns/hqdefault.jpg",
-    year: "1999",
-    date: "2026-06-09",
-    notionUrl: "https://patrickdongkiyoo.notion.site/You-are-more-than-paradise-port-of-notes-37a705406ba681c09a56ce045ea9a802",
-    lyrics: "i heard it at midnight\nIt's a song that i used to love and dream\nDon't go away\nDon't leave me alone, tender lullaby\ni can feel my heart's beat\nThe sky above me turns into a sand hill\nAnd a river passes through me\nLife goes on like a passing car's head lights\n\ni saw a dream of a southern paradise\nOver the mountains and in the sunshine\nRed flower sunset wrapped around me\ni felt so free\nBut there was no one to hold my hand\ni was alone\n\nAnd after i woke up\nStill that dream expands with my body\ni was thinking so long\nOn this land, is there something\nmore than love for me?\n\ni know that you are more than paradise\nWhen your arms are around me\ni realize everything is beautiful, just like a storm\nThough i take a plane to go somewhere far away\nBut i can't fly away my heart\n\ni saw a dream of a southern paradise\nOver the mountains and in the sunshine\nRed flower sunset wrapped around me\ni felt so free\nBut i know that you are more than paradise\nWhen your arms are around me\ni realize everything is beautiful, just like a storm"
-  }];
-
-let ytPlayer = null;
-let playOrder = [];
-let curIdx = 0;
-let isShuffled = true;
-let activeDataIdx = -1;
-let lyricsVisible = false;
-
-function esc(s) {
-  return String(s || '').replace(/[&<>"']/g,
-    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-function buildOrder(keepDataIdx) {
-  const n = SONGS.length;
-  playOrder = Array.from({length: n}, (_, i) => i);
-  if (isShuffled) {
-    for (let i = n - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
-    }
-  }
-  if (keepDataIdx !== undefined && keepDataIdx >= 0) {
-    const pos = playOrder.indexOf(keepDataIdx);
-    curIdx = pos >= 0 ? pos : 0;
-  } else {
-    curIdx = 0;
-  }
-}
-
-window.onYouTubeIframeAPIReady = function() {
-  ytPlayer = new YT.Player('yt-player', {
-    height: '100%', width: '100%',
-    playerVars: { rel: 0, modestbranding: 1, playsinline: 1,
-      origin: window.location.origin || 'https://raw.githack.com' },
-    events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange }
-  });
-};
-
-function onPlayerReady() {
-  document.getElementById('yt-placeholder').style.display = 'none';
-  const params = new URLSearchParams(window.location.search);
-  const startId = params.get('id');
-  const startDataIdx = startId ? SONGS.findIndex(s => s.youtubeId === startId) : -1;
-  if (startDataIdx >= 0) {
-    buildOrder(startDataIdx);
-    playSong(startDataIdx);
-  } else {
-    buildOrder();
-    playSong(playOrder[0]);
-  }
-}
-
-function onPlayerStateChange(event) {
-  const state = event.data;
-  if (state === YT.PlayerState.ENDED) playNext();
-  document.getElementById('play-btn').textContent =
-    state === YT.PlayerState.PLAYING ? '⏸' : '▶';
-}
-
-function playSong(dataIdx) {
-  const song = SONGS[dataIdx];
-  if (!song) return;
-  activeDataIdx = dataIdx;
-  if (ytPlayer && ytPlayer.loadVideoById) ytPlayer.loadVideoById(song.youtubeId);
-  document.getElementById('np-title').textContent = song.title || '—';
-  document.getElementById('np-meta').textContent =
-    [song.artist, song.year ? song.year + '년' : ''].filter(Boolean).join(' · ');
-  const pos = playOrder.indexOf(dataIdx);
-  if (pos !== -1) curIdx = pos;
-  document.querySelectorAll('.song-item').forEach(el => {
-    el.classList.toggle('active', parseInt(el.dataset.didx) === dataIdx);
-  });
-  updateLyricsPanel();
-}
-
-function playNext() {
-  curIdx = (curIdx + 1) % playOrder.length;
-  playSong(playOrder[curIdx]);
-}
-
-function playPrev() {
-  curIdx = (curIdx - 1 + playOrder.length) % playOrder.length;
-  playSong(playOrder[curIdx]);
-}
-
-function togglePlay() {
-  if (!ytPlayer) return;
-  const state = ytPlayer.getPlayerState();
-  if (state === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
-  else {
-    if (activeDataIdx < 0) { buildOrder(); playSong(playOrder[0]); }
-    else ytPlayer.playVideo();
-  }
-}
-
-function toggleShuffle() {
-  isShuffled = !isShuffled;
-  const btn = document.getElementById('shuffle-btn');
-  btn.classList.toggle('shuffle-on', isShuffled);
-  btn.textContent = isShuffled ? '🔀 셔플' : '▶ 순서대로';
-  buildOrder(activeDataIdx);
-}
-
-function toggleLyrics() {
-  lyricsVisible = !lyricsVisible;
-  const panel = document.getElementById('lyrics-panel');
-  const btn = document.getElementById('lyrics-btn');
-  panel.classList.toggle('visible', lyricsVisible);
-  btn.classList.toggle('lyrics-on', lyricsVisible);
-  if (lyricsVisible) updateLyricsPanel();
-}
-
-function updateLyricsPanel() {
-  const body = document.getElementById('lyrics-body');
-  if (activeDataIdx < 0) {
-    body.innerHTML = '<div class="lyrics-empty">재생 중인 곡을 선택해 주세요</div>';
-    return;
-  }
-  const song = SONGS[activeDataIdx];
-  if (!song) return;
-  if (song.lyrics) {
-    body.innerHTML = '<div class="lyrics-content">' + esc(song.lyrics) + '</div>';
-  } else {
-    const isInstrumental = !song.lyrics &&
-      (song.artist.includes('Khruangbin') || song.artist.includes('Chuck Mangione') || song.artist.includes('The Piano Guys') || song.artist.includes('DEPAPEPE'));
-    body.innerHTML = '<div class="lyrics-empty">' +
-      (isInstrumental
-        ? '🎷 연주곡입니다 (가사 없음)'
-        : '📋 가사 정보를 준비 중입니다\n<span style="font-size:11px;color:#444">Notion 페이지에서 가사를 확인하세요</span>') +
-      '</div>';
-  }
-}
-
-function renderPlaylist() {
-  document.getElementById('song-count-badge').textContent = `${SONGS.length}곡`;
-  document.getElementById('pl-label').textContent = `플레이리스트 · ${SONGS.length}곡`;
-  document.getElementById('pl-body').innerHTML = SONGS.map((s, i) => {
-    const artHtml = s.albumArt
-      ? `<img class="s-art" src="${esc(s.albumArt)}"
-             onerror="this.outerHTML='<div class=\\'s-art-ph\\'>🎵</div>'" alt="">`
-      : `<div class="s-art-ph">🎵</div>`;
-    const notionBtn = s.notionUrl
-      ? `<a class="notion-link" href="${esc(s.notionUrl)}" target="_blank"
-           onclick="event.stopPropagation()" title="Notion 페이지 열기">📝</a>`
-      : '';
-    const lyricsTag = s.lyrics
-      ? `<span style="font-size:9px;color:#555;margin-left:2px;flex-shrink:0" title="가사 있음">♪</span>`
-      : '';
-    return `
-      <div class="song-item" data-didx="${i}" onclick="playSong(${i})">
-        <span class="s-num">${i + 1}</span>
-        ${artHtml}
-        <div class="s-info">
-          <div class="s-title-wrap">
-            <span class="s-title">${esc(s.title)}</span>
-            ${lyricsTag}
-            ${notionBtn}
-          </div>
-          <div class="s-sub">${esc(s.artist)}${s.year ? ' · ' + s.year : ''}</div>
+    <div class="player-container">
+        <h1 style="text-align: center; margin-bottom: 30px; color: #333;">🎵 Patrick's Daily Music</h1>
+
+        <div id="content">
+            <div class="loading-indicator">
+                <div class="loading-spinner"></div>
+                <p>플레이리스트 로드 중...</p>
+            </div>
         </div>
-      </div>`;
-  }).join('');
-}
+    </div>
 
-renderPlaylist();
-</script>
-<script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        // Notion API 설정
+        const NOTION_API_URL = 'https://api.notion.com/v1';
+        const DATABASE_ID = '30ef1ab5-5fd7-463e-a333-e5e9b64fa8e8';
+        // 주의: 프로덕션에서는 CORS 문제로 직접 API 호출이 불가능합니다.
+        // 대신 Notion Public API 또는 서버 프록시를 사용하거나,
+        // Patrick's Playlist DB의 공개 뷰를 사용해야 합니다.
+
+        let SONGS = [];
+        let currentIndex = 0;
+        let isPlaying = false;
+        let isShuffle = false;
+        let repeatMode = 0;
+        let audioPlayer = null;
+
+        // 대체 방안: Notion 공개 데이터베이스 URL에서 정보 추출
+        // 또는 별도 JSON 파일을 호스팅하는 방법
+
+        async function loadPlaylistFromNotion() {
+            try {
+                updateSyncStatus('syncing');
+
+                // GitHub에서 songs.json 로드 (Patrick's 리포지토리)
+                // 주소: https://raw.githubusercontent.com/patrickyoo-prog/Patrick/main/songs.json
+                const response = await fetch(
+                    'https://raw.githubusercontent.com/patrickyoo-prog/Patrick/main/songs.json',
+                    {
+                        cache: 'no-store', // 항상 최신 데이터 로드
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('songs.json을 찾을 수 없습니다. GitHub에 파일이 있는지 확인하세요.');
+                    }
+                    throw new Error(`HTTP ${response.status}: 플레이리스트를 로드할 수 없습니다.`);
+                }
+
+                const data = await response.json();
+
+                // songs.json 구조: { songs: [...] } 또는 { version, lastUpdated, songs, ... }
+                SONGS = data.songs || data;
+
+                if (!Array.isArray(SONGS) || SONGS.length === 0) {
+                    throw new Error('플레이리스트가 비어있거나 올바른 형식이 아닙니다.');
+                }
+
+                console.log(`✅ 플레이리스트 로드 완료: ${SONGS.length}곡`);
+                renderPlayer();
+                updateSyncStatus('synced');
+            } catch (error) {
+                console.error('플레이리스트 로드 오류:', error);
+                showError(`
+                    <strong>플레이리스트를 로드할 수 없습니다</strong><br>
+                    ${error.message}<br><br>
+                    <small style="color: #666;">
+                    확인 사항:<br>
+                    • GitHub에 songs.json 파일이 있는가?<br>
+                    • URL: https://github.com/patrickyoo-prog/Patrick/blob/main/songs.json<br>
+                    • 인터넷 연결을 확인하세요
+                    </small>
+                `);
+                updateSyncStatus('error');
+            }
+        }
+
+        function showError(message) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="error-message">
+                    <strong>오류 발생</strong><br>
+                    ${message}
+                </div>
+            `;
+        }
+
+        function updateSyncStatus(status) {
+            const syncEl = document.querySelector('.sync-status');
+            if (syncEl) {
+                syncEl.className = `sync-status ${status}`;
+                const now = new Date().toLocaleTimeString('ko-KR');
+                if (status === 'synced') {
+                    syncEl.textContent = `✅ 동기화됨 (${now})`;
+                } else if (status === 'syncing') {
+                    syncEl.textContent = `🔄 동기화 중...`;
+                } else {
+                    syncEl.textContent = `❌ 동기화 실패`;
+                }
+            }
+        }
+
+        function renderPlayer() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <img id="albumArt" class="album-art" src="" alt="Album Art">
+
+                <div class="song-info">
+                    <div class="song-title" id="songTitle">Loading...</div>
+                    <div class="song-artist" id="songArtist"></div>
+                    <div class="song-year" id="songYear"></div>
+                    <div class="sync-status synced">✅ Notion에서 동기화</div>
+                </div>
+
+                <audio id="audioPlayer" style="display: none;"></audio>
+
+                <div class="info-section">
+                    <h3>Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button id="prev-btn">⏮</button>
+                    <button id="play-btn">▶️</button>
+                    <button id="next-btn">⏭</button>
+                </div>
+
+                <div class="shuffle-repeat">
+                    <button id="shuffle-btn">🔀 Shuffle</button>
+                    <button id="repeat-btn">🔁 Repeat</button>
+                </div>
+
+                <div class="info-section">
+                    <h3>Volume</h3>
+                    <div class="volume-control">
+                        <span style="font-size: 14px;">🔊</span>
+                        <input type="range" id="volumeControl" min="0" max="100" value="70">
+                        <span style="font-size: 14px;">🔉</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="notion-btn" onclick="openNotionPage()" title="곡 정보 보기">📋 곡 정보</button>
+                </div>
+
+                <div class="youtube-link">
+                    <a id="youtubeLink" href="" target="_blank">▶️ YouTube에서 보기</a>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px; font-size: 11px; color: #999;">
+                    <p>⚡ Notion Playlist DB에서 실시간 동기화</p>
+                </div>
+            `;
+
+            setupEventListeners();
+            loadSong();
+
+            // URL 파라미터로 특정 곡 재생
+            const urlParams = new URLSearchParams(window.location.search);
+            const songId = urlParams.get('id');
+            if (songId) {
+                const index = SONGS.findIndex(song => song.youtubeId === songId);
+                if (index !== -1) {
+                    currentIndex = index;
+                    loadSong();
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            audioPlayer = document.getElementById('audioPlayer');
+            const playBtn = document.getElementById('play-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const shuffleBtn = document.getElementById('shuffle-btn');
+            const repeatBtn = document.getElementById('repeat-btn');
+            const volumeControl = document.getElementById('volumeControl');
+            const progressBar = document.querySelector('.progress-bar');
+
+            playBtn.addEventListener('click', togglePlayPause);
+            prevBtn.addEventListener('click', prevSong);
+            nextBtn.addEventListener('click', nextSong);
+            shuffleBtn.addEventListener('click', toggleShuffle);
+            repeatBtn.addEventListener('click', toggleRepeat);
+            volumeControl.addEventListener('input', (e) => {
+                audioPlayer.volume = e.target.value / 100;
+            });
+
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            audioPlayer.addEventListener('loadedmetadata', updateDuration);
+            audioPlayer.addEventListener('ended', handleSongEnd);
+            progressBar.addEventListener('click', seekTo);
+
+            audioPlayer.volume = 0.7;
+        }
+
+        function loadSong() {
+            const song = SONGS[currentIndex];
+            if (!song) return;
+
+            document.getElementById('songTitle').textContent = song.title;
+            document.getElementById('songArtist').textContent = song.artist;
+            document.getElementById('songYear').textContent = song.year;
+            document.getElementById('albumArt').src = song.albumArt;
+            document.getElementById('youtubeLink').href = `https://youtu.be/${song.youtubeId}`;
+
+            // YouTube iframe 사용 (CORS 문제 해결)
+            audioPlayer.src = `https://www.youtube.com/watch?v=${song.youtubeId}`;
+
+            updateNotionButton();
+        }
+
+        function updateNotionButton() {
+            const btn = document.getElementById('notion-btn');
+            const song = SONGS[currentIndex];
+            if (song && song.notionUrl) {
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            } else {
+                btn.style.opacity = '0.3';
+                btn.disabled = true;
+            }
+        }
+
+        function openNotionPage() {
+            const song = SONGS[currentIndex];
+            if (song && song.notionUrl) {
+                window.open(song.notionUrl, '_blank');
+            }
+        }
+
+        function togglePlayPause() {
+            const playBtn = document.getElementById('play-btn');
+            if (isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+                playBtn.textContent = '▶️';
+            } else {
+                audioPlayer.play().catch(() => {
+                    console.log('재생 권한 필요');
+                });
+                isPlaying = true;
+                playBtn.textContent = '⏸';
+            }
+        }
+
+        function prevSong() {
+            currentIndex = (currentIndex - 1 + SONGS.length) % SONGS.length;
+            loadSong();
+            if (isPlaying) audioPlayer.play().catch(() => {});
+        }
+
+        function nextSong() {
+            if (isShuffle) {
+                currentIndex = Math.floor(Math.random() * SONGS.length);
+            } else {
+                currentIndex = (currentIndex + 1) % SONGS.length;
+            }
+            loadSong();
+            if (isPlaying) audioPlayer.play().catch(() => {});
+        }
+
+        function toggleShuffle() {
+            isShuffle = !isShuffle;
+            document.getElementById('shuffle-btn').classList.toggle('active', isShuffle);
+        }
+
+        function toggleRepeat() {
+            repeatMode = (repeatMode + 1) % 3;
+            document.getElementById('repeat-btn').classList.toggle('active', repeatMode > 0);
+        }
+
+        function updateProgress() {
+            const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            document.getElementById('progressFill').style.width = `${percent || 0}%`;
+            document.getElementById('currentTime').textContent = formatTime(audioPlayer.currentTime);
+        }
+
+        function updateDuration() {
+            document.getElementById('duration').textContent = formatTime(audioPlayer.duration);
+        }
+
+        function handleSongEnd() {
+            if (repeatMode === 2) {
+                audioPlayer.currentTime = 0;
+                audioPlayer.play().catch(() => {});
+            } else {
+                nextSong();
+            }
+        }
+
+        function seekTo(e) {
+            const percent = e.offsetX / e.currentTarget.offsetWidth;
+            audioPlayer.currentTime = percent * audioPlayer.duration;
+        }
+
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // 페이지 로드 시 플레이리스트 불러오기
+        window.addEventListener('load', loadPlaylistFromNotion);
+
+        // 주기적으로 동기화 (5분마다)
+        setInterval(async () => {
+            updateSyncStatus('syncing');
+            await loadPlaylistFromNotion();
+        }, 5 * 60 * 1000);
+    </script>
 </body>
 </html>
