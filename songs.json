@@ -1,25 +1,196 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-06-11T10:00:00+09:00",
-  "totalSongs": 2,
+  "lastUpdated": "2026-06-11T00:00:00",
+  "totalSongs": 24,
   "songs": [
     {
-      "title": "Yesterday Yes A Day",
-      "artist": "Jane Birkin",
-      "youtubeId": "_tX69JYOW5A",
-      "albumArt": "https://img.youtube.com/vi/_tX69JYOW5A/maxresdefault.jpg",
+      "title": "White Gloves",
+      "artist": "Khruangbin",
+      "youtubeId": "20cuFhgPLEo",
+      "albumArt": "https://img.youtube.com/vi/20cuFhgPLEo/maxresdefault.jpg",
+      "year": "2015",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "Like My Father",
+      "artist": "Jax",
+      "youtubeId": "GCWl50HQZIM",
+      "albumArt": "https://img.youtube.com/vi/GCWl50HQZIM/maxresdefault.jpg",
+      "year": "2021",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "Regent's Park",
+      "artist": "Bruno Major",
+      "youtubeId": "sSvAFjpLaGA",
+      "albumArt": "https://img.youtube.com/vi/sSvAFjpLaGA/maxresdefault.jpg",
+      "year": "2020",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "The Luckiest",
+      "artist": "Ben Folds",
+      "youtubeId": "f9bRmuP-kQY",
+      "albumArt": "https://img.youtube.com/vi/f9bRmuP-kQY/maxresdefault.jpg",
+      "year": "2001",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "Back To Me",
+      "artist": "The Rose",
+      "youtubeId": "fuzLp9gDcwY",
+      "albumArt": "https://img.youtube.com/vi/fuzLp9gDcwY/maxresdefault.jpg",
+      "year": "2023",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "기쁨, 솔품, 아름다운 마음",
+      "artist": "AKMU",
+      "youtubeId": "SNn_H_Q2moo",
+      "albumArt": "https://img.youtube.com/vi/SNn_H_Q2moo/maxresdefault.jpg",
+      "year": "2026",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "Feels So Good",
+      "artist": "Chuck Mangione",
+      "youtubeId": "FExBwfQHXlE",
+      "albumArt": "https://img.youtube.com/vi/FExBwfQHXlE/maxresdefault.jpg",
       "year": "1977",
       "date": "2026-06-11",
-      "notionUrl": "https://patrickdongkiyoo.notion.site/Yesterday-Yes-A-Day-Jane-Birkin-37b705406ba68121a97ed57e6140e050"
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "Bite the Bullet",
+      "artist": "Little Majorette",
+      "youtubeId": "Z0wElwBaeTY",
+      "albumArt": "https://img.youtube.com/vi/Z0wElwBaeTY/maxresdefault.jpg",
+      "year": "2011",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "All of Me",
+      "artist": "The Piano Guys",
+      "youtubeId": "9fAZIQ-vpdw",
+      "albumArt": "https://img.youtube.com/vi/9fAZIQ-vpdw/maxresdefault.jpg",
+      "year": "2011",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
     },
     {
       "title": "Yesterday When I Was Young",
       "artist": "Roy Clark",
-      "youtubeId": "lfx9Xxw2zXQ",
-      "albumArt": "https://img.youtube.com/vi/lfx9Xxw2zXQ/maxresdefault.jpg",
-      "year": "1970",
-      "date": "2026-06-10",
-      "notionUrl": "https://patrickdongkiyoo.notion.site/Yesterday-When-I-Was-Young-Roy-Clark-37a705406ba68174a465d106dac7083e"
+      "youtubeId": "UOVMXX-iWfo",
+      "albumArt": "https://img.youtube.com/vi/UOVMXX-iWfo/maxresdefault.jpg",
+      "year": "1969",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "後來 (Later)",
+      "artist": "Rene Liu",
+      "youtubeId": "t0igPuDjYUE",
+      "albumArt": "https://img.youtube.com/vi/t0igPuDjYUE/maxresdefault.jpg",
+      "year": "1999",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "보리차 (Barley Tea)",
+      "artist": "Chun Yongsung",
+      "youtubeId": "qREqxPyqpeA",
+      "albumArt": "https://img.youtube.com/vi/qREqxPyqpeA/maxresdefault.jpg",
+      "year": "2022",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "月亮代表我的心 (The Moon Represents My Heart)",
+      "artist": "Zhao Peng",
+      "youtubeId": "oGQWwz6MbHA",
+      "albumArt": "https://img.youtube.com/vi/oGQWwz6MbHA/maxresdefault.jpg",
+      "year": "2022",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "Si dolce è il tormento",
+      "artist": "Paolo Fresu ft. Uri Caine",
+      "youtubeId": "6vnybkvRnq8",
+      "albumArt": "https://img.youtube.com/vi/6vnybkvRnq8/maxresdefault.jpg",
+      "year": "2020",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "lihidattane.",
+      "artist": "DEPAPEPE",
+      "youtubeId": "fcUZdyOInA4",
+      "albumArt": "https://img.youtube.com/vi/fcUZdyOInA4/maxresdefault.jpg",
+      "year": "2005",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "Whiskey and Morphine",
+      "artist": "Alexander Jean",
+      "youtubeId": "ACDf9fhpuqo",
+      "albumArt": "https://img.youtube.com/vi/ACDf9fhpuqo/maxresdefault.jpg",
+      "year": "2016",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "요즘 내 모습",
+      "artist": "윤도현 (feat. 타블로, 케이윌)",
+      "youtubeId": "xZYeE00l6JU",
+      "albumArt": "https://img.youtube.com/vi/xZYeE00l6JU/maxresdefault.jpg",
+      "year": "2014",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "Yesterday Yes A Day",
+      "artist": "Jane Birkin",
+      "youtubeId": "ypqXVQe-H6c",
+      "albumArt": "https://img.youtube.com/vi/ypqXVQe-H6c/maxresdefault.jpg",
+      "year": "1977",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "어떤 날 (A Certain Day)",
+      "artist": "Xeuda",
+      "youtubeId": "PGQp916ND98",
+      "albumArt": "https://img.youtube.com/vi/PGQp916ND98/maxresdefault.jpg",
+      "year": "2019",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "(You are) more than paradise",
+      "artist": "port of notes",
+      "youtubeId": "VXDt6KLiJgY",
+      "albumArt": "https://img.youtube.com/vi/VXDt6KLiJgY/maxresdefault.jpg",
+      "year": "2015",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
+    },
+    {
+      "title": "나에게서 닮신에게 (From Me To You)",
+      "artist": "Jungwoo",
+      "youtubeId": "zoRVJ-Y63Ms",
+      "albumArt": "https://img.youtube.com/vi/zoRVJ-Y63Ms/maxresdefault.jpg",
+      "year": "2019",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site"
     }
   ]
 }
