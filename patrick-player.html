@@ -561,24 +561,16 @@
         }
 
         function togglePlayPause() {
-            const playBtn = document.getElementById('play-btn');
-            if (isPlaying) {
-                audioPlayer.pause();
-                isPlaying = false;
-                playBtn.textContent = '▶️';
-            } else {
-                audioPlayer.play().catch(() => {
-                    console.log('재생 권한 필요');
-                });
-                isPlaying = true;
-                playBtn.textContent = '⏸';
+            // YouTube에서 곡 재생
+            const song = SONGS[currentIndex];
+            if (song && song.youtubeId) {
+                window.open(`https://youtu.be/${song.youtubeId}`, '_blank');
             }
         }
 
         function prevSong() {
             currentIndex = (currentIndex - 1 + SONGS.length) % SONGS.length;
             loadSong();
-            if (isPlaying) audioPlayer.play().catch(() => {});
         }
 
         function nextSong() {
@@ -588,7 +580,6 @@
                 currentIndex = (currentIndex + 1) % SONGS.length;
             }
             loadSong();
-            if (isPlaying) audioPlayer.play().catch(() => {});
         }
 
         function toggleShuffle() {
