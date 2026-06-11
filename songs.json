@@ -1,0 +1,25 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-06-11T10:00:00+09:00",
+  "totalSongs": 2,
+  "songs": [
+    {
+      "title": "Yesterday Yes A Day",
+      "artist": "Jane Birkin",
+      "youtubeId": "_tX69JYOW5A",
+      "albumArt": "https://img.youtube.com/vi/_tX69JYOW5A/maxresdefault.jpg",
+      "year": "1977",
+      "date": "2026-06-11",
+      "notionUrl": "https://patrickdongkiyoo.notion.site/Yesterday-Yes-A-Day-Jane-Birkin-37b705406ba68121a97ed57e6140e050"
+    },
+    {
+      "title": "Yesterday When I Was Young",
+      "artist": "Roy Clark",
+      "youtubeId": "lfx9Xxw2zXQ",
+      "albumArt": "https://img.youtube.com/vi/lfx9Xxw2zXQ/maxresdefault.jpg",
+      "year": "1970",
+      "date": "2026-06-10",
+      "notionUrl": "https://patrickdongkiyoo.notion.site/Yesterday-When-I-Was-Young-Roy-Clark-37a705406ba68174a465d106dac7083e"
+    }
+  ]
+}
