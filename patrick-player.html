@@ -80,7 +80,7 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
 .ctrl.flex-grow { flex: 1; }
 .ctrl#play-btn { flex: 0 0 48px; height: 48px; font-size: 18px; border-radius: 50%; background: #1db954; color: #000; }
 .ctrl#play-btn:hover { background: #1ed760; }
-.ctrl#notion-btn { transition: opacity 0.12s, background 0.12s; }
+.ctrl#notion-btn:disabled { opacity: 0.3; cursor: default; }
 .divider { height: 1px; background: rgba(255,255,255,0.06); }
 .pl-section { flex: 1; overflow-y: auto; min-height: 0; padding-bottom: 20px; }
 .pl-header {
@@ -322,7 +322,7 @@ const SONGS = [
   },
   {
     title: "그냥",
-    artist: "우주히피 (Cosmos Hippie)",
+    artist: "우주히피",
     youtubeId: "JiUJJ6Qh6J4",
     albumArt: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/cb/f6/ad/cbf6ad27-3f95-b345-3009-7c95530ef5b2/single_more_cover.jpg/600x600bb.jpg",
     year: "2017",
@@ -363,7 +363,7 @@ const SONGS = [
     albumArt: "https://i.ytimg.com/vi/7gzUCDhC-Ns/hqdefault.jpg",
     year: "1999",
     date: "2026-06-09",
-    notionUrl: "https://patrickdongkiyoo.notion.site/You-are-more-than-paradise-port-of-notes-37a705406ba681c09a56ce045ea9a802"
+    notionUrl: "https://patrickdongkiyoo.notion.site/More-Than-Paradise-port-of-notes-37a705406ba681c09a56ce045ea9a802"
   },
   {
     title: "어른",
@@ -391,6 +391,24 @@ const SONGS = [
     year: "1977",
     date: "2026-06-11",
     notionUrl: "https://patrickdongkiyoo.notion.site/Yesterday-Yes-A-Day-Jane-Birkin-37b705406ba68121a97ed57e6140e050"
+  },
+  {
+    title: "Take on Me (MTV Unplugged - Summer Solstice)",
+    artist: "a-ha",
+    youtubeId: "hyPudrPNSuQ",
+    albumArt: "https://img.youtube.com/vi/hyPudrPNSuQ/maxresdefault.jpg",
+    year: "1985 / 2017",
+    date: "2026-06-11",
+    notionUrl: "https://patrickdongkiyoo.notion.site/Take-on-Me-MTV-Unplugged-Summer-Solstice-a-ha-37c705406ba68149bea5c9fb469e93d6"
+  },
+  {
+    title: "負けないで",
+    artist: "ZARD",
+    youtubeId: "_4DJkOUU648",
+    albumArt: "https://i.ytimg.com/vi/_4DJkOUU648/hqdefault.jpg",
+    year: "1993",
+    date: "2026-06-12",
+    notionUrl: "https://patrickdongkiyoo.notion.site/ZARD-37c705406ba681348e26c946033bf1ff"
   }
 ];
 
@@ -468,6 +486,22 @@ function playSong(dataIdx) {
   updateNotionButton();
 }
 
+function openNotionPage() {
+  const song = SONGS[activeDataIdx];
+  if (song && song.notionUrl) {
+    window.open(song.notionUrl, '_blank');
+  }
+}
+
+function updateNotionButton() {
+  const btn = document.getElementById('notion-btn');
+  if (!btn) return;
+  const song = SONGS[activeDataIdx];
+  const hasUrl = !!(song && song.notionUrl);
+  btn.style.opacity = hasUrl ? '1' : '0.3';
+  btn.disabled = !hasUrl;
+}
+
 function playNext() {
   curIdx = (curIdx + 1) % playOrder.length;
   playSong(playOrder[curIdx]);
@@ -496,21 +530,6 @@ function toggleShuffle() {
   buildOrder(activeDataIdx);
 }
 
-function openNotionPage() {
-  const song = SONGS[activeDataIdx];
-  if (song && song.notionUrl) {
-    window.open(song.notionUrl, '_blank');
-  }
-}
-
-function updateNotionButton() {
-  const btn = document.getElementById('notion-btn');
-  if (!btn) return;
-  const song = SONGS[activeDataIdx];
-  btn.style.opacity = (song && song.notionUrl) ? '1' : '0.3';
-  btn.disabled = !(song && song.notionUrl);
-}
-
 function renderPlaylist() {
   document.getElementById('song-count-badge').textContent = `${SONGS.length}곡`;
   document.getElementById('pl-label').textContent = `플레이리스트 · ${SONGS.length}곡`;
@@ -536,7 +555,6 @@ function renderPlaylist() {
         </div>
       </div>`;
   }).join('');
-  updateNotionButton();
 }
 
 renderPlaylist();
